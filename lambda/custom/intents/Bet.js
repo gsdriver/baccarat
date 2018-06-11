@@ -130,8 +130,16 @@ module.exports = {
           speech += this.t('BET_WIN_TIE').replace('{0}', game.rules.tieBet * game.bet);
         } else {
           game.bankroll += 2 * game.bet;
+          if ((game.betOn == 'banker') && game.rules.commission) {
+            // Commission
+            game.bankroll -= (game.rules.commission * game.bet);
+          }
           speech += this.t('BET_WIN');
         }
+      } else if (dealerTotal == playerTotal) {
+        // It's a tie and you didn't bet on it - so no winner
+        game.bankroll += game.bet;
+        speech += this.t('BET_TIE');
       } else {
         speech += this.t('BET_LOSE');
       }

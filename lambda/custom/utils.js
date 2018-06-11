@@ -24,6 +24,7 @@ const availableGames = {
       numberOfDecks: 6,       // Number of decks
       canReset: true,         // Can the game be reset
       tieBet: 8,              // Odds payed on tie bet
+      commission: 0.05,       // Commission you pay if you bet on banker
    },
  },
 };
@@ -305,8 +306,8 @@ function buildDisplayTemplate(context, callback) {
     }
 
     const formData = {
-      dealer: game.dealer ? JSON.stringify(game.dealer) : '',
-      player: game.player ? JSON.stringify(game.player) : '',
+      dealer: game.dealer ? JSON.stringify(game.dealer) : '[]',
+      player: game.player ? JSON.stringify(game.player) : '[]',
       nextCards: JSON.stringify(nextCards),
     };
     if (game.activePlayer == 'none') {

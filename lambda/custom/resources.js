@@ -16,6 +16,7 @@ const common = {
   'BET_DEALER_STAND': '<break time=\'300ms\'/> I stand on this hand. ',
   'BET_WIN': 'You win! ',
   'BET_LOSE': 'You lost! ',
+  'BET_TIE': 'It\'s a tie <break time=\'200ms\'/> no winner. ',
   // From Coffee.js
   'COFFEE_DRINK': 'Nothing like a strong cup of joe. What else can I help you with?',
   'COFFEE_REPROMPT': 'What else can I help you with?',
