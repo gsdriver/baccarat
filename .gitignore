@@ -1,0 +1,6 @@
+.idea
+node_modules
+*.zip
+build
+update.bat
+attributes.txt

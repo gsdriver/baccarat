@@ -1,0 +1,36 @@
+{
+  "manifest": {
+    "publishingInformation": {
+      "locales": {
+        "en-US": {
+          "name": "Baccarat Table"
+        },
+        "en-CA": {
+          "name": "Baccarat Table"
+        },
+        "en-IN": {
+          "name": "Baccarat Table"
+        },
+        "en-AU": {
+          "name": "Baccarat Table"
+        },
+        "en-GB": {
+          "name": "Baccarat Table"
+        }
+      }
+    },
+    "apis": {
+      "custom": {
+        "endpoint": {
+          "sourceDir": "lambda\\custom"
+        },
+        "interfaces": [
+          {
+            "type": "RENDER_TEMPLATE"
+          }
+        ]
+      }
+    },
+    "manifestVersion": "1.0"
+  }
+}
