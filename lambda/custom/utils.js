@@ -14,6 +14,20 @@ const makeImage = Alexa.utils.ImageUtils.makeImage;
 const speechUtils = require('alexa-speech-utils')();
 const seedrandom = require('seedrandom');
 
+const availableGames = {
+  'basic': {
+    startingBankroll: 5000,
+    bankroll: 5000,
+    rules: {
+      minBet: 5,              // Minimum bet
+      maxBet: 1000,           // Maximum bet
+      numberOfDecks: 6,       // Number of decks
+      canReset: true,         // Can the game be reset
+      tieBet: 8,              // Odds payed on tie bet
+   },
+ },
+};
+
 module.exports = {
   emitResponse: function(context, error, response, speech, reprompt, cardTitle, cardText) {
     const formData = {};
@@ -67,19 +81,7 @@ module.exports = {
   },
   initializeGame: function(context, game) {
     context.attributes.currentGame = game;
-    const newGame = {
-      startingBankroll: 5000,
-      bankroll: 5000,
-      rules: {
-        minBet: 5,              // Minimum bet
-        maxBet: 1000,           // Maximum bet
-        numberOfDecks: 6,       // Number of decks
-        canReset: true,         // Can the game be reset
-        tieBet: 9,              // Odds payed on tie bet
-      },
-      player: [],
-      dealer: [],
-    };
+    const newGame = Object.assign(availableGames.basic);
 
     module.exports.shuffleDeck(newGame, context.event.session.user.userId);
     context.attributes[context.attributes.currentGame] = newGame;
@@ -142,7 +144,7 @@ module.exports = {
     game.deck = [];
     const suits = ['C', 'D', 'H', 'S'];
     for (i = 0; i < game.rules.numberOfDecks; i++) {
-      for (rank = 2; rank <= 14; rank++) {
+      for (rank = 1; rank <= 13; rank++) {
         suits.map((item) => {
           game.deck.push({'rank': rank, 'suit': item});
         });
@@ -172,6 +174,10 @@ module.exports = {
       .replace('{0}', ranks[card.rank - 1])
       .replace('{1}', suits[card.suit]);
   },
+  sayBetOn: function(context, betOn) {
+    const players = JSON.parse(context.t('BETON_OPTIONS'));
+    return (players[betOn]) ? players[betOn] : betOn;
+  },
   readHand: function(context, readBankroll, callback) {
     let speech = '';
     let reprompt = '';
@@ -180,50 +186,32 @@ module.exports = {
     if (readBankroll) {
       speech += context.t('READ_BANKROLL').replace('{0}', game.bankroll);
     }
-    if (context.handler.state == 'ATWAR') {
-      // Repeat what they have
-      speech += context.t('READ_CARDS')
-        .replace('{0}', module.exports.sayCard(context, game.player[0]))
-        .replace('{1}', module.exports.sayCard(context, game.dealer[0]));
-      reprompt = context.t('BET_REPROMPT_WAR');
-    } else if (game.player.length) {
+    if (game.player && game.player.length) {
       // Repeat what they had
-      speech += context.t('READ_OLD_CARDS')
-        .replace('{0}', module.exports.sayCard(context, game.player[game.player.length - 1]))
-        .replace('{1}', module.exports.sayCard(context, game.dealer[game.dealer.length - 1]));
+      let cards;
+
+      cards = speechUtils.and(game.player.map((x) => module.exports.sayCard(context, x)));
+      speech += context.t('READ_OLD_PLAYER_CARDS')
+        .replace('{0}', cards)
+        .replace('{1}', module.exports.handTotal(game.player));
+
+      cards = speechUtils.and(game.dealer.map((x) => module.exports.sayCard(context, x)));
+      speech += context.t('READ_OLD_DEALER_CARDS')
+        .replace('{0}', cards)
+        .replace('{1}', module.exports.handTotal(game.dealer));
+
       reprompt = context.t('BET_PLAY_AGAIN');
+    } else {
+      reprompt = context.t('GENERIC_REPROMPT');
     }
 
     callback(speech, reprompt);
-  },
-  sayDealtCards: function(context, playerCard, dealerCard, bet) {
-    const format = (bet ? context.t('BET_CARDS_SAYBET') : context.t('BET_CARDS'));
-    let playerText;
-    let dealerText;
-
-    if (playerCard.rank > 10) {
-      playerText = module.exports.pickRandomOption(context, 'GOOD_PLAYER_CARD');
-    } else if (playerCard.rank < 5) {
-      playerText = module.exports.pickRandomOption(context, 'BAD_PLAYER_CARD');
-    } else {
-      playerText = module.exports.pickRandomOption(context, 'NORMAL_PLAYER_CARD');
-    }
-
-    if ((dealerCard.rank > playerCard.rank) && (playerCard.rank > 10)) {
-      dealerText = module.exports.pickRandomOption(context, 'DEALER_TOUGH_BEAT');
-    } else {
-      dealerText = module.exports.pickRandomOption(context, 'DEALER_CARD');
-    }
-
-    return format
-        .replace('{0}', playerText.replace('{0}', module.exports.sayCard(context, playerCard)))
-        .replace('{1}', dealerText.replace('{0}', module.exports.sayCard(context, dealerCard)))
-        .replace('{2}', bet);
   },
   getBetAmount: function(context, callback) {
     let reprompt;
     let speech;
     let amount;
+    let betOn;
     const game = context.attributes[context.attributes.currentGame];
 
     if (context.event.request.intent.slots && context.event.request.intent.slots.Amount
@@ -233,6 +221,19 @@ module.exports = {
       amount = game.bet;
     } else {
       amount = game.minBet;
+    }
+
+    if (context.event.request.intent.slots && context.event.request.intent.slots.Player
+      && context.event.request.intent.slots.Player.value) {
+      // Force this to player, banker, or tie
+      betOn = context.event.request.intent.slots.Player.value.toLowerCase();
+      if ((betOn != 'banker') && (betOn != 'tie')) {
+        betOn = 'player';
+      }
+    } else if (game.betOn) {
+      betOn = game.betOn;
+    } else {
+      betOn = 'player';
     }
 
     // If we didn't get the amount, just make it a minimum bet
@@ -256,7 +257,18 @@ module.exports = {
       }
     }
 
-    callback(amount, speech, reprompt);
+    callback(amount, betOn, speech, reprompt);
+  },
+  handTotal: function(cards) {
+    // Total is between 0 and 9
+    let total = 0;
+    cards.forEach((card) => {
+      if (card.rank < 10) {
+        total += card.rank;
+      }
+    });
+
+    return (total % 10);
   },
   pickRandomOption: function(context, res) {
     const game = context.attributes[context.attributes.currentGame];
@@ -284,7 +296,8 @@ function buildDisplayTemplate(context, callback) {
     const game = context.attributes[context.attributes.currentGame];
     let nextCards;
 
-    if ((game.player.length !== 1) || (game.player[0].rank !== game.dealer[0].rank)) {
+    if (!game.player || (game.player.length !== 1)
+      || (game.player[0].rank !== game.dealer[0].rank)) {
       nextCards = game.deck.slice(0, 2);
     } else {
       // We're going to burn three if there is a war (assume so)
@@ -292,8 +305,8 @@ function buildDisplayTemplate(context, callback) {
     }
 
     const formData = {
-      dealer: JSON.stringify(game.dealer),
-      player: JSON.stringify(game.player),
+      dealer: game.dealer ? JSON.stringify(game.dealer) : '',
+      player: game.player ? JSON.stringify(game.player) : '',
       nextCards: JSON.stringify(nextCards),
     };
     if (game.activePlayer == 'none') {

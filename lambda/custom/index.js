@@ -7,6 +7,7 @@
 const AWS = require('aws-sdk');
 const Alexa = require('alexa-sdk');
 const Launch = require('./intents/Launch');
+const Bet = require('./intents/Bet');
 const Exit = require('./intents/Exit');
 const Repeat = require('./intents/Repeat');
 const HighScore = require('./intents/HighScore');
@@ -24,11 +25,13 @@ const playingHandlers = Alexa.CreateStateHandler('PLAYING', {
     this.emitWithState('NewSession');
   },
   'LaunchRequest': Launch.handleIntent,
+  'BetIntent': Bet.handleIntent,
   'HighScoreIntent': HighScore.handleIntent,
   'OrderMartiniIntent': Martini.handleIntent,
   'OrderCoffeeIntent': Coffee.handleIntent,
   'AMAZON.RepeatIntent': Repeat.handleIntent,
   'AMAZON.FallbackIntent': Repeat.handleIntent,
+  'AMAZON.YesIntent': Bet.handleIntent,
   'AMAZON.NoIntent': Exit.handleIntent,
   'AMAZON.StopIntent': Exit.handleIntent,
   'AMAZON.CancelIntent': Exit.handleIntent,

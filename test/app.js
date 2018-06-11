@@ -11,7 +11,7 @@ const LOCALE = 'en-CA';
 function BuildEvent(argv)
 {
   // Templates that can fill in the intent
-  const bet = {'name': 'BetIntent', 'slots': {'Amount': {'name': 'Amount', 'value': ''}}};
+  const bet = {'name': 'BetIntent', 'slots': {'Amount': {'name': 'Amount', 'value': ''}, 'Player': {'name': 'Player', 'value': ''}}};
   const reset = {'name': 'ResetIntent', 'slots': {}};
   const yes = {'name': 'AMAZON.YesIntent', 'slots': {}};
   const no = {'name': 'AMAZON.NoIntent', 'slots': {}};
@@ -135,7 +135,10 @@ function BuildEvent(argv)
   } else if (argv[2] == 'bet') {
     lambda.request.intent = bet;
     if (argv.length > 3) {
-      bet.slots.Amount.value = argv[3];
+      bet.slots.Amount.value = (argv[3] == 'none') ? undefined : argv[3];
+    }
+    if (argv.length > 4) {
+      bet.slots.Player.value = argv[4];
     }
   } else if (argv[2] == 'launch') {
     return openEvent;

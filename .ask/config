@@ -4,7 +4,7 @@
       "skill_id": "amzn1.ask.skill.5e88f594-31a0-4d86-9a67-1aee5d717c19",
       "was_cloned": false,
       "merge": {
-        "manifest": {
+        "skillManifest": {
           "apis": {
             "custom": {
               "endpoint": {
@@ -13,8 +13,7 @@
             }
           }
         }
-      },
-      "in_skill_products": []
+      }
     }
   }
 }

@@ -65,7 +65,6 @@
         },
         {
           "name": "HighScoreIntent",
-          "slots": [],
           "samples": [
             "read high scores",
             "tell me high scores",
@@ -83,9 +82,178 @@
         {
           "name": "AMAZON.NoIntent",
           "samples": []
+        },
+        {
+          "name": "BetIntent",
+          "slots": [
+            {
+              "name": "Amount",
+              "type": "AMAZON.NUMBER"
+            },
+            {
+              "name": "Player",
+              "type": "PLAYER",
+              "samples": [
+                "banker",
+                "player"
+              ]
+            }
+          ],
+          "samples": [
+            "bet {Amount}",
+            "play {Amount}",
+            "bet for {Amount}",
+            "play for {Amount}",
+            "bet {Amount} pounds",
+            "play {Amount} pounds",
+            "bet for {Amount} pounds",
+            "play for {Amount} pounds",
+            "bet {Amount} pound",
+            "play {Amount} pound",
+            "bet for {Amount} pound",
+            "play for {Amount} pound",
+            "do bet",
+            "do deal",
+            "deal",
+            "bet",
+            "bet {Amount} on {Player}",
+            "play {Amount} on {Player}",
+            "bet for {Amount} on {Player}",
+            "play for {Amount} on {Player}",
+            "bet {Amount} pounds on {Player}",
+            "play {Amount} pounds on {Player}",
+            "bet for {Amount} pounds on {Player}",
+            "play for {Amount} pounds on {Player}",
+            "bet {Amount} pound on {Player}",
+            "play {Amount} pound on {Player}",
+            "bet for {Amount} pound on {Player}",
+            "play for {Amount} pound on {Player}",
+            "do bet on {Player}",
+            "do deal on {Player}",
+            "deal on {Player}",
+            "bet on {Player}",
+            "bet {Amount} on the {Player}",
+            "play {Amount} on the {Player}",
+            "bet for {Amount} on the {Player}",
+            "play for {Amount} on the {Player}",
+            "bet {Amount} pounds on the {Player}",
+            "play {Amount} pounds on the {Player}",
+            "bet for {Amount} pounds on the {Player}",
+            "play for {Amount} pounds on the {Player}",
+            "bet {Amount} pound on the {Player}",
+            "play {Amount} pound on the {Player}",
+            "bet for {Amount} pound on the {Player}",
+            "play for {Amount} pound on the {Player}",
+            "do bet on the {Player}",
+            "do deal on the {Player}",
+            "deal on the {Player}",
+            "bet on the {Player}",
+            "bet {Amount} for {Player}",
+            "play {Amount} for {Player}",
+            "bet for {Amount} for {Player}",
+            "play for {Amount} for {Player}",
+            "bet {Amount} pounds for {Player}",
+            "play {Amount} pounds for {Player}",
+            "bet for {Amount} pounds for {Player}",
+            "play for {Amount} pounds for {Player}",
+            "bet {Amount} pound for {Player}",
+            "play {Amount} pound for {Player}",
+            "bet for {Amount} pound for {Player}",
+            "play for {Amount} pound for {Player}",
+            "do bet for {Player}",
+            "do deal for {Player}",
+            "deal for {Player}",
+            "bet for {Player}",
+            "bet {Amount} for the {Player}",
+            "play {Amount} for the {Player}",
+            "bet for {Amount} for the {Player}",
+            "play for {Amount} for the {Player}",
+            "bet {Amount} pounds for the {Player}",
+            "play {Amount} pounds for the {Player}",
+            "bet for {Amount} pounds for the {Player}",
+            "play for {Amount} pounds for the {Player}",
+            "bet {Amount} pound for the {Player}",
+            "play {Amount} pound for the {Player}",
+            "bet for {Amount} pound for the {Player}",
+            "play for {Amount} pound for the {Player}",
+            "do bet for the {Player}",
+            "do deal for the {Player}",
+            "deal for the {Player}",
+            "bet for the {Player}"
+          ]
         }
-     ],
-      "types": []
-    }
+      ],
+      "types": [
+        {
+          "name": "PLAYER",
+          "values": [
+            {
+              "name": {
+                "value": "tie"
+              }
+            },
+            {
+              "name": {
+                "value": "banker"
+              }
+            },
+            {
+              "name": {
+                "value": "player"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "dialog": {
+      "intents": [
+        {
+          "name": "BetIntent",
+          "confirmationRequired": false,
+          "prompts": {},
+          "slots": [
+            {
+              "name": "Amount",
+              "type": "AMAZON.NUMBER",
+              "confirmationRequired": false,
+              "elicitationRequired": true,
+              "prompts": {
+                "elicitation": "Elicit.Slot.903795661373.469675544888"
+              }
+            },
+            {
+              "name": "Player",
+              "type": "PLAYER",
+              "confirmationRequired": false,
+              "elicitationRequired": true,
+              "prompts": {
+                "elicitation": "Elicit.Slot.903795661373.1428157900736"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "prompts": [
+      {
+        "id": "Elicit.Slot.903795661373.1428157900736",
+        "variations": [
+          {
+            "type": "PlainText",
+            "value": "Would you like to place a bet on the player, banker, or a tie?"
+          }
+        ]
+      },
+      {
+        "id": "Elicit.Slot.903795661373.469675544888",
+        "variations": [
+          {
+            "type": "PlainText",
+            "value": "How much would you like to bet?"
+          }
+        ]
+      }
+    ]
   }
 }

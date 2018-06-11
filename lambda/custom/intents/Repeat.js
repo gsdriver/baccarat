@@ -13,7 +13,8 @@ module.exports = {
       const game = this.attributes[this.attributes.currentGame];
 
       if (game.bet) {
-        output = this.t('READ_BET').replace('{0}', game.bet);
+        output += this.t('READ_BET').replace('{0}', game.bet)
+            .replace('{1}', utils.sayBetOn(this, game.betOn));
       }
       output += (speech + reprompt);
       utils.emitResponse(this, null, null, output, reprompt);
