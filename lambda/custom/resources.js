@@ -5,6 +5,9 @@ const common = {
   // From index.js
   'UNKNOWN_INTENT': 'Sorry, I didn\'t get that. Try saying Help.',
   'UNKNOWN_INTENT_REPROMPT': 'Try saying Help.',
+  // From Coffee.js
+  'COFFEE_DRINK': 'Nothing like a strong cup of joe. What else can I help you with?',
+  'COFFEE_REPROMPT': 'What else can I help you with?',
   // From Exit.js
   'EXIT_GAME': '{0} Goodbye.',
   // From Help.js
@@ -15,6 +18,9 @@ const common = {
   // From Launch.js
   'LAUNCH_WELCOME': 'Welcome to Baccarat Table. ',
   'LAUNCH_REPROMPT': 'Say bet to play.',
+  // From Martini.js
+  'MARTINI_DRINK': 'Ah, that hits the spot. What else can I help you with?',
+  'MARTINI_REPROMPT': 'What else can I help you with?',
   // From utils.js
   'MORE_THAN_PLAYERS': 'over {0}',
   'GENERIC_REPROMPT': 'What else can I help with?',

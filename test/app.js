@@ -19,6 +19,8 @@ function BuildEvent(argv)
   const stop = {'name': 'AMAZON.StopIntent', 'slots': {}};
   const cancel = {'name': 'AMAZON.CancelIntent', 'slots': {}};
   const highScore = {'name': 'HighScoreIntent', 'slots': {}};
+  const martini = {'name': 'OrderMartiniIntent', 'slots': {}};
+  const coffee = {'name': 'OrderCoffeeIntent', 'slots': {}};
   const repeat = {'name': 'AMAZON.RepeatIntent', 'slots': {}};
   const lambda = {
     "session": {
@@ -149,6 +151,10 @@ function BuildEvent(argv)
     lambda.request.intent = reset;
   } else if (argv[2] == 'repeat') {
     lambda.request.intent = repeat;
+  } else if (argv[2] == 'martini') {
+    lambda.request.intent = martini;
+  } else if (argv[2] == 'coffee') {
+    lambda.request.intent = coffee;
   } else if (argv[2] == 'yes') {
     lambda.request.intent = yes;
   } else if (argv[2] == 'no') {

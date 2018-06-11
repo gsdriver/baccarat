@@ -10,6 +10,8 @@ const Launch = require('./intents/Launch');
 const Exit = require('./intents/Exit');
 const Repeat = require('./intents/Repeat');
 const HighScore = require('./intents/HighScore');
+const Martini = require('./intents/Martini');
+const Coffee = require('./intents/Coffee');
 const resources = require('./resources');
 const utils = require('./utils');
 const request = require('request');
@@ -23,6 +25,8 @@ const playingHandlers = Alexa.CreateStateHandler('PLAYING', {
   },
   'LaunchRequest': Launch.handleIntent,
   'HighScoreIntent': HighScore.handleIntent,
+  'OrderMartiniIntent': Martini.handleIntent,
+  'OrderCoffeeIntent': Coffee.handleIntent,
   'AMAZON.RepeatIntent': Repeat.handleIntent,
   'AMAZON.FallbackIntent': Repeat.handleIntent,
   'AMAZON.NoIntent': Exit.handleIntent,
@@ -84,7 +88,7 @@ function runGame(event, context, callback) {
         if (err) {
           console.log('Error reading attributes ' + err);
         } else {
-          request.post({url: process.env.SERVICEURL + 'war/newUser'}, (err, res, body) => {
+          request.post({url: process.env.SERVICEURL + 'baccarat/newUser'}, (err, res, body) => {
           });
         }
       } else {
