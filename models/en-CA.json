@@ -76,7 +76,10 @@
           "name": "OrderCoffeeIntent",
           "samples": [
             "order a coffee",
+            "order some coffee",
+            "get me some coffee",
             "get me a coffee",
+            "can i have some coffee",
             "can i have a coffee"
           ]
         },

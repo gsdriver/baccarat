@@ -8,8 +8,25 @@ const utils = require('../utils');
 
 module.exports = {
   handleIntent: function() {
-    this.attributes.temp.coffee = (this.attributes.temp.coffee + 1) || 1;
+    if (!this.attributes.temp.martini) {
+      this.attributes.temp.coffee = (this.attributes.temp.coffee + 1) || 1;
+    }
+
+    let reprompt = (this.attributes.temp.reprompt ? this.attributes.temp.reprompt : this.t('COFFEE_REPROMPT'));
+    reprompt = removeCoffee(this, reprompt);
+    const speech = (this.attributes.temp.martini ? this.t('COFFEE_DRINK_SOBER') : this.t('COFFEE_DRINK')) + reprompt;
     this.attributes.temp.martini = 0;
-    utils.emitResponse(this, null, null, this.t('COFFEE_DRINK'), this.t('COFFEE_REPROMPT'));
+
+    utils.emitResponse(this, null, null, speech, reprompt);
   },
 };
+
+function removeCoffee(context, text) {
+  let newText = text;
+
+  if (text.indexOf(context.t('COFFEE')) > -1) {
+    newText = context.t('COFFEE_REPROMPT');
+  }
+
+  return newText;
+}

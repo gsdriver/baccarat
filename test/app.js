@@ -175,9 +175,22 @@ function myResponse(appId) {
   this._appId = appId;
 }
 
+function ssmlToText(ssml) {
+  let text = ssml;
+
+  // Replace break with ...
+  text = text.replace(/<break[^>]+>/g, ' ... ');
+
+  // Remove all other angle brackets
+  text = text.replace(/<\/?[^>]+(>|$)/g, '');
+  text = text.replace(/\s+/g, ' ').trim();
+  return text;
+}
+
 myResponse.succeed = function(result) {
   if (result.response.outputSpeech.ssml) {
     console.log('AS SSML: ' + result.response.outputSpeech.ssml);
+    console.log('AS TEXT: ' + ssmlToText(result.response.outputSpeech.ssml));
   } else {
     console.log(result.response.outputSpeech.text);
   }

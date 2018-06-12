@@ -33,6 +33,9 @@ module.exports = {
   emitResponse: function(context, error, response, speech, reprompt, cardTitle, cardText) {
     const formData = {};
 
+    context.attributes.temp.speech = speech;
+    context.attributes.temp.reprompt = reprompt;
+
     // Async call to save state and logs if necessary
     if (process.env.SAVELOG) {
       const result = (error) ? error : ((response) ? response : speech);
@@ -201,7 +204,7 @@ module.exports = {
         .replace('{0}', cards)
         .replace('{1}', module.exports.handTotal(game.dealer));
 
-      reprompt = context.t('BET_PLAY_AGAIN');
+      reprompt = context.t('BET_PLAY_AGAIN').split('|')[0];
     } else {
       reprompt = context.t('GENERIC_REPROMPT');
     }

@@ -7,19 +7,21 @@ const common = {
   'UNKNOWN_INTENT_REPROMPT': 'Try saying Help.',
   // From Bet.js
   'BET_INVALID_REPROMPT': 'What else can I help you with?',
-  'BET_PLAY_AGAIN': 'Would you like to play again? ',
-  'BET_PLAYER_CARDS': '<audio src=\"https://s3-us-west-2.amazonaws.com/alexasoundclips/dealcard.mp3\"/> You got {0} and {1} for a total of {2}. ',
+  'BET_PLAY_AGAIN': 'Would you like to play again? |Would you like to play again? |Would you like to play again? Or if you\'re feeling tipsy say order some coffee. ',
+  'BET_PLAYER_CARDS': '<audio src=\"https://s3-us-west-2.amazonaws.com/alexasoundclips/dealcard.mp3\"/> You got {0} and {1} for a total of {2}. |<audio src=\"https://s3-us-west-2.amazonaws.com/alexasoundclips/dealcard.mp3\"/> {0} plus {1} makes {2} <break time=\'300ms\'/> or {3}? |<audio src=\"https://s3-us-west-2.amazonaws.com/alexasoundclips/dealcard.mp3\"/> {0} <break time=\'200ms\'/> or {4} <break time=\'300ms\'/> and is that a {1}? Is that {2} or {3}? |<audio src=\"https://s3-us-west-2.amazonaws.com/alexasoundclips/dealcard.mp3\"/> Some cards in front of me? <break time=\'400ms\'/>Are we playing blackjack?  <break time=\'200ms\'/> I need some coffee. ',
   'BET_DEALER_CARDS': '<audio src=\"https://s3-us-west-2.amazonaws.com/alexasoundclips/dealcard.mp3\"/> I got {0} and {1} for a total of {2}. ',
-  'BET_NEXT_PLAYERCARD': '<break time=\'400ms\'/> <audio src=\"https://s3-us-west-2.amazonaws.com/alexasoundclips/dealcard.mp3\"/> You drew a {0} for a total of {1}. ',
-  'BET_PLAYER_STAND': '<break time=\'300ms\'/> You stand on this hand. ',
+  'BET_NEXT_PLAYERCARD': '<break time=\'400ms\'/> <audio src=\"https://s3-us-west-2.amazonaws.com/alexasoundclips/dealcard.mp3\"/> You drew a {0} for a total of {1}. |<break time=\'400ms\'/> <audio src=\"https://s3-us-west-2.amazonaws.com/alexasoundclips/dealcard.mp3\"/> a {0} makes {1}. |<break time=\'400ms\'/> <audio src=\"https://s3-us-west-2.amazonaws.com/alexasoundclips/dealcard.mp3\"/> another card? <break time=\'200ms\'/> Is that {0} or {2}? I think that makes {1}. |<break time=\'400ms\'/> <audio src=\"https://s3-us-west-2.amazonaws.com/alexasoundclips/dealcard.mp3\"/> Did I ask for another card? <break time=\'200ms\'/> Is that blackjack? I need some coffee. ',
+  'BET_PLAYER_STAND': '<break time=\'300ms\'/> You stand on this hand. |<break time=\'300ms\'/> You stand on this hand. |<break time=\'300ms\'/> I think I\'m good on this one. ',
   'BET_NEXT_DEALERCARD': '<break time=\'400ms\'/> <audio src=\"https://s3-us-west-2.amazonaws.com/alexasoundclips/dealcard.mp3\"/> I drew a {0} for a total of {1}. ',
   'BET_DEALER_STAND': '<break time=\'300ms\'/> I stand on this hand. ',
-  'BET_WIN': 'You win! ',
-  'BET_LOSE': 'You lost! ',
-  'BET_TIE': 'It\'s a tie <break time=\'200ms\'/> no winner. ',
+  'BET_WIN': 'You win! |You win! |Oh, more money! |Why are there more chips? ',
+  'BET_LOSE': 'You lost! |You lost! |Where did my money go? ',
+  'BET_TIE': 'It\'s a tie <break time=\'200ms\'/> no winner. |It\'s a tie <break time=\'200ms\'/> no winner. |Wait, what happened? ',
   // From Coffee.js
-  'COFFEE_DRINK': 'Nothing like a strong cup of joe. What else can I help you with?',
+  'COFFEE_DRINK': 'Nothing like a strong cup of joe. ',
+  'COFFEE_DRINK_SOBER': 'Whew, that cleared my head. ',
   'COFFEE_REPROMPT': 'What else can I help you with?',
+  'COFFEE': 'coffee',
   // From Exit.js
   'EXIT_GAME': '{0} Goodbye.',
   // From Help.js
@@ -31,8 +33,10 @@ const common = {
   'LAUNCH_WELCOME': 'Welcome to Baccarat Table. ',
   'LAUNCH_REPROMPT': 'Say bet to play.',
   // From Martini.js
-  'MARTINI_DRINK': 'Ah, that hits the spot. What else can I help you with?',
+  'MARTINI_DRINK': 'Ah, that hits the spot. ',
+  'MARTINI_DRINK_CALM': 'Ah, that calms my nerves. ',
   'MARTINI_REPROMPT': 'What else can I help you with?',
+  'MARTINI': 'martini',
   // From utils.js
   'MORE_THAN_PLAYERS': 'over {0}',
   'GENERIC_REPROMPT': 'What else can I help with?',
@@ -52,8 +56,8 @@ const dollar = {
   'BET_EXCEEDS_MAX': 'Sorry, this bet exceeds the maximum bet of ${0}.',
   'BET_LESSTHAN_MIN': 'Sorry, this bet is less than the minimum bet of ${0}.',
   'BET_EXCEEDS_BANKROLL': 'Sorry, this bet exceeds your bankroll of ${0}.',
-  'BET_CARDS_SAYBET': 'You bet ${0} on {1} ',
-  'BET_WIN_TIE': 'You win ${0} on your tie bet! ',
+  'BET_CARDS_SAYBET': 'You bet ${0} on {1} |${0} on {1} I think |${0} <break time=\'100ms\'/> ${2}? <break time=\'300ms\'/> {1}? ',
+  'BET_WIN_TIE': 'You win ${0} on your tie bet! |You win ${0} on your tie bet! |Wait, there\'s more chips in front of me. ',
   'RESET_BANKROLL': 'You do not have enough to place the minimum bet. Resetting bankroll to ${0}. ',
   // From Launch.js
   'LAUNCH_WELCOME_BACK': 'Welcome back to Baccarat Table. You have ${0}. ',
@@ -71,7 +75,7 @@ const pound = {
   'BET_EXCEEDS_MAX': 'Sorry, this bet exceeds the maximum bet of £{0}.',
   'BET_LESSTHAN_MIN': 'Sorry, this bet is less than the minimum bet of £{0}.',
   'BET_EXCEEDS_BANKROLL': 'Sorry, this bet exceeds your bankroll of £{0}.',
-  'BET_CARDS_SAYBET': 'You bet £{0} on {1} ',
+  'BET_CARDS_SAYBET': 'You bet £{0} on {1} |£{0} on {1} I think |£{0} <break time=\'100ms\'/> £{2}? <break time=\'300ms\'/> {1}? ',
   'BET_WIN_TIE': 'You win £{0} on your tie bet! ',
   'RESET_BANKROLL': 'You do not have enough to place the minimum bet. Resetting bankroll to £{0}. ',
   // From Launch.js

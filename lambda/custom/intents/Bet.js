@@ -5,7 +5,7 @@
 'use strict';
 
 const utils = require('../utils');
-// const seedrandom = require('seedrandom');
+const seedrandom = require('seedrandom');
 
 module.exports = {
   handleIntent: function() {
@@ -22,7 +22,10 @@ module.exports = {
       let speech = '';
       const game = this.attributes[this.attributes.currentGame];
       if ((game.bet !== amount) || (game.betOn !== betOn)) {
-        speech += this.t('BET_CARDS_SAYBET').replace('{0}', amount).replace('{1}', utils.sayBetOn(this, betOn));
+        speech += getDrunkOption(this, 'BET_CARDS_SAYBET')
+            .replace('{0}', amount)
+            .replace('{1}', utils.sayBetOn(this, betOn))
+            .replace('{2}', Math.floor(amount * 1.75));
       }
 
       // Save the new bet information
@@ -49,11 +52,13 @@ module.exports = {
       let dealerTotal = utils.handTotal(game.dealer);
 
       // Let them know what they got
-      speech += this.t('BET_PLAYER_CARDS')
+      speech += getDrunkOption(this, 'BET_PLAYER_CARDS')
           .replace('{0}', utils.sayCard(this, game.player[0]))
           .replace('{1}', utils.sayCard(this, game.player[1]))
-          .replace('{2}', playerTotal);
-      speech += this.t('BET_DEALER_CARDS')
+          .replace('{2}', playerTotal)
+          .replace('{3}', (playerTotal + 2) % 10)
+          .replace('{4}', utils.sayCard(this, game.dealer[0]));
+      speech += getDrunkOption(this, 'BET_DEALER_CARDS')
           .replace('{0}', utils.sayCard(this, game.dealer[0]))
           .replace('{1}', utils.sayCard(this, game.dealer[1]))
           .replace('{2}', dealerTotal);
@@ -66,11 +71,12 @@ module.exports = {
           game.player.push(game.deck.shift());
           playerCard = game.player[2].rank;
           playerTotal = utils.handTotal(game.player);
-          speech += this.t('BET_NEXT_PLAYERCARD')
+          speech += getDrunkOption(this, 'BET_NEXT_PLAYERCARD')
               .replace('{0}', utils.sayCard(this, game.player[2]))
-              .replace('{1}', playerTotal);
+              .replace('{1}', playerTotal)
+              .replace('{2}', utils.sayCard(this, {rank: game.dealer[1].rank, suit: 'H'}));
         } else {
-          speech += this.t('BET_PLAYER_STAND');
+          speech += getDrunkOption(this, 'BET_PLAYER_STAND');
         }
 
         // What does the banker do?
@@ -106,11 +112,11 @@ module.exports = {
         if (dealerDraw) {
           game.dealer.push(game.deck.shift());
           dealerTotal = utils.handTotal(game.dealer);
-          speech += this.t('BET_NEXT_DEALERCARD')
+          speech += getDrunkOption(this, 'BET_NEXT_DEALERCARD')
               .replace('{0}', utils.sayCard(this, game.dealer[2]))
               .replace('{1}', dealerTotal);
         } else {
-          speech += this.t('BET_DEALER_STAND');
+          speech += getDrunkOption(this, 'BET_DEALER_STAND');
         }
       }
 
@@ -127,26 +133,62 @@ module.exports = {
       if (winner) {
         if (dealerTotal == playerTotal) {
           game.bankroll += (game.rules.tieBet + 1) * game.bet;
-          speech += this.t('BET_WIN_TIE').replace('{0}', game.rules.tieBet * game.bet);
+          speech += getDrunkOption(this, 'BET_WIN_TIE').replace('{0}', game.rules.tieBet * game.bet);
         } else {
           game.bankroll += 2 * game.bet;
           if ((game.betOn == 'banker') && game.rules.commission) {
             // Commission
             game.bankroll -= (game.rules.commission * game.bet);
           }
-          speech += this.t('BET_WIN');
+          speech += getDrunkOption(this, 'BET_WIN');
         }
       } else if (dealerTotal == playerTotal) {
         // It's a tie and you didn't bet on it - so no winner
         game.bankroll += game.bet;
-        speech += this.t('BET_TIE');
+        speech += getDrunkOption(this, 'BET_TIE');
       } else {
-        speech += this.t('BET_LOSE');
+        speech += getDrunkOption(this, 'BET_LOSE');
       }
 
-      const reprompt = this.t('BET_PLAY_AGAIN');
+      // Reset bankroll if necessary
+      if ((game.bankroll < game.rules.minBet) && game.rules.canReset) {
+        game.bankroll = game.startingBankroll;
+        speech += this.t('RESET_BANKROLL').replace('{0}', game.bankroll);
+      }
+
+      const reprompt = getDrunkOption(this, 'BET_PLAY_AGAIN');
       speech += reprompt;
       utils.emitResponse(this, null, null, speech, reprompt);
     });
   },
 };
+
+function getDrunkOption(context, value) {
+  // How many martinis have you had?
+  const options = context.t(value).split('|');
+  const martini = context.attributes.temp.martini;
+  let drunkLevel;
+  const game = context.attributes[context.attributes.currentGame];
+
+  if (process.env.NODRUNKTEXT || !martini) {
+    // Spoil sport
+    drunkLevel = 0;
+  } else {
+    // OK, you're drunk
+    const randomValue = seedrandom(value + context.event.session.user.userId + (game.timestamp ? game.timestamp : ''))();
+    let j = Math.floor(randomValue * (martini + 1));
+    if (j == (martini + 1)) {
+      j--;
+    }
+
+    // OK, there's a 2 / (martini + 1) chance you'll get each level
+    // of drunk text, until you hit the last option - the more drinks
+    // you've had, the more likely you'll get drunk text
+    drunkLevel = Math.floor(j / 2);
+    if (drunkLevel > (options.length - 1)) {
+      drunkLevel = options.length - 1;
+    }
+  }
+
+  return options[drunkLevel];
+}

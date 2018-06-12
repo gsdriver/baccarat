@@ -13,7 +13,7 @@ module.exports = {
       // No ads for bots
       utils.emitResponse(this, null, this.t('EXIT_GAME').replace('{0}', ''), null, null);
     } else {
-      ads.getAd(this.attributes, 'war', this.event.request.locale, (adText) => {
+      ads.getAd(this.attributes, 'baccarat', this.event.request.locale, (adText) => {
         utils.emitResponse(this, null, this.t('EXIT_GAME').replace('{0}', adText), null, null);
       });
     }
