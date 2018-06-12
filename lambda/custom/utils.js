@@ -298,15 +298,7 @@ function buildDisplayTemplate(context, callback) {
     context.attributes.display = true;
     const start = Date.now();
     const game = context.attributes[context.attributes.currentGame];
-    let nextCards;
-
-    if (!game.player || (game.player.length !== 1)
-      || (game.player[0].rank !== game.dealer[0].rank)) {
-      nextCards = game.deck.slice(0, 2);
-    } else {
-      // We're going to burn three if there is a war (assume so)
-      nextCards = game.deck.slice(3, 5);
-    }
+    const nextCards = game.deck.slice(0, 6);
 
     const formData = {
       dealer: game.dealer ? JSON.stringify(game.dealer) : '[]',
@@ -318,7 +310,7 @@ function buildDisplayTemplate(context, callback) {
     }
 
     const params = {
-      url: process.env.SERVICEURL + 'war/drawImage',
+      url: process.env.SERVICEURL + 'baccarat/drawImage',
       formData: formData,
       timeout: 3000,
     };
