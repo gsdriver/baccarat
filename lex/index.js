@@ -94,7 +94,9 @@ function passToAlexa(intentRequest, intentName, callback) {
     lambda.request.locale = lambda.session.attributes.playerLocale;
   }
 
+  const start = Date.now();
   Lambda.invoke({FunctionName: 'Baccarat', Payload: JSON.stringify(lambda)}, (err, data) => {
+    console.log('Invoking Lambda took ' + (Date.now() - start) + ' ms');
     if (err) {
       console.log(err);
       callback({
@@ -138,10 +140,9 @@ function passToAlexa(intentRequest, intentName, callback) {
 
 function dispatch(intentRequest, callback) {
   const intentName = intentRequest.currentIntent.name;
-  const mapping = {'Bet': 'BetIntent', 'Cancel': 'AMAZON.CancelIntent', 'Help': 'AMAZON.HelpIntent',
-    'HighScore': 'HighScoreIntent', 'No': 'AMAZON.NoIntent', 'PlaceSideBet': 'PlaceSideBetIntent',
-    'RemoveSideBet': 'RemoveSideBetIntent', 'Launch': 'LaunchRequest',
-    'Repeat': 'AMAZON.RepeatIntent', 'Yes': 'AMAZON.YesIntent',
+  const mapping = {'Baccarat_Bet': 'BetIntent', 'Baccarat_Cancel': 'AMAZON.CancelIntent', 'Baccarat_Help': 'AMAZON.HelpIntent',
+    'Baccarat_HighScore': 'HighScoreIntent', 'Baccarat_No': 'AMAZON.NoIntent', 'Baccarat_Launch': 'LaunchRequest',
+    'Baccarat_Repeat': 'AMAZON.RepeatIntent', 'Baccarat_Yes': 'AMAZON.YesIntent',
   };
   const alexaIntent = mapping[intentName];
 
