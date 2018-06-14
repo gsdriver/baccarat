@@ -10,6 +10,9 @@ module.exports = {
   handleIntent: function() {
     if (!this.attributes.temp.martini) {
       this.attributes.temp.coffee = (this.attributes.temp.coffee + 1) || 1;
+      if (!this.attributes.maxCoffee || (this.attributes.temp.coffee > this.attributes.maxCoffee)) {
+        this.attributes.maxCoffee = this.attributes.temp.coffee;
+      }
     }
 
     let reprompt = (this.attributes.temp.reprompt ? this.attributes.temp.reprompt : this.t('COFFEE_REPROMPT'));

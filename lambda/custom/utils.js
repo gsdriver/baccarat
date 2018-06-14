@@ -231,7 +231,9 @@ module.exports = {
       && context.event.request.intent.slots.Player.value) {
       // Force this to player, banker, or tie
       betOn = context.event.request.intent.slots.Player.value.toLowerCase();
-      if ((betOn != 'banker') && (betOn != 'tie')) {
+      if (betOn == 'dealer') {
+        betOn = 'banker';
+      } else if ((betOn != 'banker') && (betOn != 'tie')) {
         betOn = 'player';
       }
     } else if (game.betOn) {
