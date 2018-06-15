@@ -22,7 +22,8 @@ module.exports = {
     // Shaken not stirred
     const martiniSounds = parseInt(process.env.MARTINICOUNT);
     if (!isNaN(martiniSounds) && !this.attributes.bot) {
-      const randomValue = seedrandom(this.event.session.user.userId + (game.timestamp ? game.timestamp : ''))();
+      const randomValue = seedrandom(this.attributes.temp.martini +
+          this.event.session.user.userId + (game.timestamp ? game.timestamp : ''))();
       const choice = 1 + Math.floor(randomValue * martiniSounds);
       if (choice > martiniSounds) {
         choice--;
