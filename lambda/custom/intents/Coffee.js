@@ -14,6 +14,7 @@ module.exports = {
         this.attributes.maxCoffee = this.attributes.temp.coffee;
       }
     }
+    this.attributes.wasDrunk = undefined;
 
     let reprompt = (this.attributes.temp.reprompt ? this.attributes.temp.reprompt : this.t('COFFEE_REPROMPT'));
     reprompt = removeCoffee(this, reprompt);

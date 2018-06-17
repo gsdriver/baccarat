@@ -19,6 +19,11 @@ module.exports = {
       speech = this.t('LAUNCH_WELCOME');
     }
 
+    if (this.attributes.wasDrunk) {
+      speech += this.t('LAUNCH_SOBER');
+      this.attributes.wasDrunk = undefined;
+    }
+
     this.handler.state = 'PLAYING';
     const reprompt = this.t('LAUNCH_REPROMPT');
     speech += reprompt;

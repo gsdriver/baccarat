@@ -13,6 +13,7 @@ module.exports = {
     let speech = '';
     if (!this.attributes.temp.coffee) {
       this.attributes.temp.martini = (this.attributes.temp.martini + 1) || 1;
+      this.attributes.wasDrunk = true;
       if (!this.attributes.maxMartini
         || (this.attributes.temp.martini > this.attributes.maxMartini)) {
         this.attributes.maxMartini = this.attributes.temp.martini;

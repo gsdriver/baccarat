@@ -32,6 +32,7 @@ const common = {
   // From Launch.js
   'LAUNCH_WELCOME': 'Welcome to Baccarat Table. ',
   'LAUNCH_REPROMPT': 'Say bet to play.',
+  'LAUNCH_SOBER': 'The break did you good <break time=\'200ms\'/> your head is cleared up. ',
   // From Martini.js
   'MARTINI_DRINK': 'Ah, that hits the spot. ',
   'MARTINI_DRINK_CALM': 'Ah, that calms my nerves. ',
