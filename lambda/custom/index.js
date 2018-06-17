@@ -6,6 +6,7 @@
 
 const AWS = require('aws-sdk');
 const Alexa = require('alexa-sdk');
+const CanFulfill = require('./intents/CanFulfill');
 const Launch = require('./intents/Launch');
 const Bet = require('./intents/Bet');
 const Exit = require('./intents/Exit');
@@ -80,6 +81,15 @@ function runGame(event, context, callback) {
   if (!process.env.NOLOG) {
     console.log(JSON.stringify(event));
   }
+
+  // If this is a CanFulfill, handle this separately
+  if (event.request && (event.request.type == 'CanFulfillIntentRequest')) {
+    CanFulfill.check(event, (response) => {
+      context.succeed(response);
+    });
+    return;
+  }
+
   const alexa = Alexa.handler(event, context);
   alexa.appId = APP_ID;
   alexa.resources = resources.languageStrings;
