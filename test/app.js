@@ -142,6 +142,13 @@ function BuildEvent(argv)
     }
   } else if (argv[2] == 'launch') {
     return openEvent;
+  } else if (argv[2] == "seed") {
+    if (fs.existsSync("seed.txt")) {
+      data = fs.readFileSync("seed.txt", 'utf8');
+      if (data) {
+        return JSON.parse(data);
+      }
+    }
   } else if (argv[2] == 'highscore') {
     lambda.request.intent = highScore;
   } else if (argv[2] == 'help') {
@@ -167,12 +174,14 @@ function BuildEvent(argv)
     return null;
   }
 
-  return lambda;
-}
+  // Write the last action
+  fs.writeFile('lastaction.txt', JSON.stringify(lambda), (err) => {
+    if (err) {
+      console.log(err);
+    }
+  });
 
-// Simple response - just print out what I'm given
-function myResponse(appId) {
-  this._appId = appId;
+  return lambda;
 }
 
 function ssmlToText(ssml) {
@@ -187,9 +196,16 @@ function ssmlToText(ssml) {
   return text;
 }
 
-myResponse.succeed = function(result) {
-  if (!result || !result.response || !result.response.outputSpeech) {
-    console.log(JSON.stringify(result));
+// Simple response - just print out what I'm given
+function myResponse(appId) {
+  this._appId = appId;
+}
+
+function myResponse(err, result) {
+  if (err) {
+    console.log('ERROR; ' + err.stack);
+  } else if (!result.response || !result.response.outputSpeech) {
+    console.log('GOT ' + JSON.stringify(result));
   } else {
     if (result.response.outputSpeech.ssml) {
       console.log('AS SSML: ' + result.response.outputSpeech.ssml);
@@ -201,20 +217,19 @@ myResponse.succeed = function(result) {
       console.log('Card Content: ' + result.response.card.content);
     }
     console.log('The session ' + ((!result.response.shouldEndSession) ? 'stays open.' : 'closes.'));
+    if (result.sessionAttributes && !process.env.NOLOG) {
+      console.log('"attributes": ' + JSON.stringify(result.sessionAttributes));
+    }
     if (result.sessionAttributes) {
       // Output the attributes too
       const fs = require('fs');
       fs.writeFile(attributeFile, JSON.stringify(result.sessionAttributes), (err) => {
-        if (!process.env.NOLOG) {
-          console.log('attributes:' + JSON.stringify(result.sessionAttributes) + ',');
+        if (err) {
+          console.log(err);
         }
       });
     }
   }
-}
-
-myResponse.fail = function(e) {
-  console.log(e);
 }
 
 // Build the event object and call the app
@@ -222,7 +237,7 @@ if ((process.argv.length == 3) && (process.argv[2] == 'clear')) {
   const fs = require('fs');
 
   // Clear is a special case - delete this entry from the DB and delete the attributes.txt file
-  dynamodb.deleteItem({TableName: 'Baccarat', Key: { userId: {S: USERID}}}, function (error, data) {
+  dynamodb.deleteItem({TableName: 'Baccarat2', Key: { id: {S: USERID}}}, function (error, data) {
     console.log("Deleted " + error);
     if (fs.existsSync(attributeFile)) {
       fs.unlinkSync(attributeFile);
@@ -231,6 +246,6 @@ if ((process.argv.length == 3) && (process.argv[2] == 'clear')) {
 } else {
   var event = BuildEvent(process.argv);
   if (event) {
-      mainApp.handler(event, myResponse);
+      mainApp.handler(event, null, myResponse);
   }
 }

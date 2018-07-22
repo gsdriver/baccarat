@@ -4,3 +4,5 @@ node_modules
 build
 update.bat
 attributes.txt
+lastaction.txt
+seed.txt

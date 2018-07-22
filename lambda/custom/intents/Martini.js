@@ -4,27 +4,33 @@
 
 'use strict';
 
-const utils = require('../utils');
 const seedrandom = require('seedrandom');
 
 module.exports = {
-  handleIntent: function() {
-    const game = this.attributes[this.attributes.currentGame];
+  canHandle: function(handlerInput) {
+    const request = handlerInput.requestEnvelope.request;
+
+    return ((request.type === 'IntentRequest') && (request.intent.name === 'OrderMartiniIntent'));
+  },
+  handle: function(handlerInput) {
+    const event = handlerInput.requestEnvelope;
+    const attributes = handlerInput.attributesManager.getSessionAttributes();
+    const res = require('../resources')(event.request.locale);
+    const game = attributes[attributes.currentGame];
     let speech = '';
-    if (!this.attributes.temp.coffee) {
-      this.attributes.temp.martini = (this.attributes.temp.martini + 1) || 1;
-      this.attributes.wasDrunk = true;
-      if (!this.attributes.maxMartini
-        || (this.attributes.temp.martini > this.attributes.maxMartini)) {
-        this.attributes.maxMartini = this.attributes.temp.martini;
+
+    if (!attributes.temp.coffee) {
+      attributes.temp.martini = (attributes.temp.martini + 1) || 1;
+      if (!attributes.maxMartini || (attributes.temp.martini > attributes.maxMartini)) {
+        attributes.maxMartini = attributes.temp.martini;
       }
     }
 
     // Shaken not stirred
     const martiniSounds = parseInt(process.env.MARTINICOUNT);
-    if (!isNaN(martiniSounds) && !this.attributes.bot) {
-      const randomValue = seedrandom(this.attributes.temp.martini +
-          this.event.session.user.userId + (game.timestamp ? game.timestamp : ''))();
+    if (!isNaN(martiniSounds) && !attributes.bot) {
+      const randomValue = seedrandom(attributes.temp.martini +
+          event.session.user.userId + (game.timestamp ? game.timestamp : ''))();
       const choice = 1 + Math.floor(randomValue * martiniSounds);
       if (choice > martiniSounds) {
         choice--;
@@ -32,21 +38,19 @@ module.exports = {
       speech += `<audio src="https://s3-us-west-2.amazonaws.com/alexasoundclips/baccarat/martini${choice}.mp3"/> `;
     }
 
-    let reprompt = (this.attributes.temp.reprompt ? this.attributes.temp.reprompt : this.t('MARTINI_REPROMPT'));
-    reprompt = removeMartini(this, reprompt);
-    speech += (this.attributes.temp.coffee ? this.t('MARTINI_DRINK_CALM') : this.t('MARTINI_DRINK')) + reprompt;
-    this.attributes.temp.coffee = 0;
+    let reprompt = (attributes.temp.reprompt
+      ? attributes.temp.reprompt
+      : res.strings.MARTINI_REPROMPT);
+    if (reprompt.indexOf(res.strings.MARTINI) > -1) {
+      reprompt = res.strings.MARTINI_REPROMPT;
+    }
+    speech += (attributes.temp.coffee
+      ? res.strings.MARTINI_DRINK_CALM
+      : res.strings.MARTINI_DRINK) + reprompt;
+    attributes.temp.coffee = 0;
 
-    utils.emitResponse(this, null, null, speech, reprompt);
+    handlerInput.responseBuilder
+      .speak(speech)
+      .reprompt(reprompt);
   },
 };
-
-function removeMartini(context, text) {
-  let newText = text;
-
-  if (text.indexOf(context.t('MARTINI')) > -1) {
-    newText = context.t('MARTINI_REPROMPT');
-  }
-
-  return newText;
-}

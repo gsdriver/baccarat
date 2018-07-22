@@ -8,9 +8,6 @@ const AWS = require('aws-sdk');
 AWS.config.update({region: 'us-east-1'});
 const request = require('request');
 const querystring = require('querystring');
-const Alexa = require('alexa-sdk');
-// utility methods for creating Image and TextField objects
-const makeImage = Alexa.utils.ImageUtils.makeImage;
 const speechUtils = require('alexa-speech-utils')();
 const seedrandom = require('seedrandom');
 
@@ -30,74 +27,23 @@ const availableGames = {
 };
 
 module.exports = {
-  emitResponse: function(context, error, response, speech, reprompt, cardTitle, cardText) {
-    const formData = {};
-
-    context.attributes.temp.speech = speech;
-    context.attributes.temp.reprompt = reprompt;
-
-    // Async call to save state and logs if necessary
-    if (process.env.SAVELOG) {
-      const result = (error) ? error : ((response) ? response : speech);
-      formData.savelog = JSON.stringify({
-        event: this.event,
-        result: result,
-      });
-    }
-    if (response || context.attributes.temp.forceSave) {
-      formData.savedb = JSON.stringify({
-        userId: context.event.session.user.userId,
-        attributes: context.attributes,
-      });
-    }
-
-    if (formData.savelog || formData.savedb) {
-      const params = {
-        url: process.env.SERVICEURL + 'baccarat/saveState',
-        formData: formData,
-      };
-      request.post(params, (err, res, body) => {
-        if (err) {
-          console.log(err);
-        }
-      });
-    }
-
-    if (error) {
-      const res = require('./' + context.event.request.locale + '/resources');
-      console.log('Speech error: ' + error);
-      context.response.speak(error)
-        .listen(res.strings.ERROR_REPROMPT);
-    } else if (response) {
-      context.response.speak(response);
-    } else if (cardTitle) {
-      context.response.speak(speech)
-        .listen(reprompt)
-        .cardRenderer(cardTitle, cardText);
-    } else {
-      context.response.speak(speech)
-        .listen(reprompt);
-    }
-
-    buildDisplayTemplate(context, () => {
-      context.emit(':responseReady');
-    });
-  },
-  initializeGame: function(context, game) {
-    context.attributes.currentGame = game;
+  initializeGame: function(event, attributes, game) {
+    attributes.currentGame = game;
     const newGame = Object.assign(availableGames.basic);
 
-    module.exports.shuffleDeck(newGame, context.event.session.user.userId);
-    context.attributes[context.attributes.currentGame] = newGame;
+    module.exports.shuffleDeck(newGame, event.session.user.userId);
+    attributes[attributes.currentGame] = newGame;
   },
-  readLeaderBoard: function(context, callback) {
-    const attributes = context.attributes;
+  readLeaderBoard: function(handlerInput, callback) {
+    const event = handlerInput.requestEnvelope;
+    const attributes = handlerInput.attributesManager.getSessionAttributes();
     const game = attributes[attributes.currentGame];
+    const res = require('./resources')(event.request.locale);
     let leaderURL = process.env.SERVICEURL + 'baccarat/leaders';
     let speech = '';
     const params = {};
 
-    params.userId = context.event.session.user.userId;
+    params.userId = event.session.user.userId;
     params.score = game.bankroll;
     params.game = attributes.currentGame;
 
@@ -114,26 +60,26 @@ module.exports = {
       }, (err, response, body) => {
       if (err) {
         // No scores to read
-        speech = context.t('LEADER_NO_SCORES');
+        speech = res.strings.LEADER_NO_SCORES;
       } else {
         const leaders = JSON.parse(body);
 
         if (!leaders.count || !leaders.top) {
           // Something went wrong
-          speech = context.t('LEADER_NO_SCORES');
+          speech = res.strings.LEADER_NO_SCORES;
         } else {
           if (leaders.rank) {
-            speech += context.t('LEADER_BANKROLL_RANKING')
+            speech += res.strings.LEADER_BANKROLL_RANKING
               .replace('{0}', game.bankroll)
               .replace('{1}', leaders.rank)
-              .replace('{2}', roundPlayers(context, leaders.count));
+              .replace('{2}', roundPlayers(event, leaders.count));
           }
 
           // And what is the leader board?
           let topScores = leaders.top;
-          topScores = topScores.map((x) => context.t('LEADER_BANKROLL_FORMAT').replace('{0}', x));
-          speech += context.t('LEADER_TOP_BANKROLLS').replace('{0}', topScores.length);
-          speech += speechUtils.and(topScores, {locale: context.event.request.locale, pause: '300ms'});
+          topScores = topScores.map((x) => res.strings.LEADER_BANKROLL_FORMAT.replace('{0}', x));
+          speech += res.strings.LEADER_TOP_BANKROLLS.replace('{0}', topScores.length);
+          speech += speechUtils.and(topScores, {locale: event.request.locale, pause: '300ms'});
         }
       }
 
@@ -170,67 +116,71 @@ module.exports = {
 
     console.log('Shuffle took ' + (Date.now() - start) + ' ms');
   },
-  sayCard: function(context, card) {
-    const suits = JSON.parse(context.t('CARD_SUITS'));
-    const ranks = context.t('CARD_RANKS').split('|');
+  sayCard: function(event, card) {
+    const res = require('./resources')(event.request.locale);
+    const suits = JSON.parse(res.strings.CARD_SUITS);
+    const ranks = res.strings.CARD_RANKS.split('|');
 
-    return context.t('CARD_NAME')
+    return res.strings.CARD_NAME
       .replace('{0}', ranks[card.rank - 1])
       .replace('{1}', suits[card.suit]);
   },
-  sayBetOn: function(context, betOn) {
-    const players = JSON.parse(context.t('BETON_OPTIONS'));
+  sayBetOn: function(event, betOn) {
+    const res = require('./resources')(event.request.locale);
+    const players = JSON.parse(res.strings.BETON_OPTIONS);
     return (players[betOn]) ? players[betOn] : betOn;
   },
-  readHand: function(context, readBankroll, callback) {
+  readHand: function(event, attributes, readBankroll, callback) {
+    const res = require('./resources')(event.request.locale);
     let speech = '';
     let reprompt = '';
-    const game = context.attributes[context.attributes.currentGame];
+    const game = attributes[attributes.currentGame];
 
     if (readBankroll) {
-      speech += context.t('READ_BANKROLL').replace('{0}', game.bankroll);
+      speech += res.strings.READ_BANKROLL.replace('{0}', game.bankroll);
     }
     if (game.player && game.player.length) {
       // Repeat what they had
       let cards;
 
-      cards = speechUtils.and(game.player.map((x) => module.exports.sayCard(context, x)));
-      speech += context.t('READ_OLD_PLAYER_CARDS')
+      cards = speechUtils.and(game.player.map((x) => module.exports.sayCard(event, x)));
+      speech += res.strings.READ_OLD_PLAYER_CARDS
         .replace('{0}', cards)
         .replace('{1}', module.exports.handTotal(game.player));
 
-      cards = speechUtils.and(game.dealer.map((x) => module.exports.sayCard(context, x)));
-      speech += context.t('READ_OLD_DEALER_CARDS')
+      cards = speechUtils.and(game.dealer.map((x) => module.exports.sayCard(event, x)));
+      speech += res.strings.READ_OLD_DEALER_CARDS
         .replace('{0}', cards)
         .replace('{1}', module.exports.handTotal(game.dealer));
 
-      reprompt = context.t('BET_PLAY_AGAIN').split('|')[0];
+      reprompt = res.strings.BET_PLAY_AGAIN.split('|')[0];
     } else {
-      reprompt = context.t('GENERIC_REPROMPT');
+      reprompt = res.strings.GENERIC_REPROMPT;
     }
 
     callback(speech, reprompt);
   },
-  getBetAmount: function(context, callback) {
+  getBetAmount: function(event, attributes, callback) {
     let reprompt;
     let speech;
     let amount;
     let betOn;
-    const game = context.attributes[context.attributes.currentGame];
+    const game = attributes[attributes.currentGame];
+    const res = require('./resources')(event.request.locale);
 
-    if (context.event.request.intent.slots && context.event.request.intent.slots.Amount
-      && context.event.request.intent.slots.Amount.value) {
-      amount = parseInt(context.event.request.intent.slots.Amount.value);
+    if (event.request.intent.slots && event.request.intent.slots.Amount
+      && event.request.intent.slots.Amount.value) {
+      amount = parseInt(event.request.intent.slots.Amount.value);
     } else if (game.bet) {
       amount = game.bet;
     } else {
       amount = game.minBet;
     }
 
-    if (context.event.request.intent.slots && context.event.request.intent.slots.Player
-      && context.event.request.intent.slots.Player.value) {
+    if (event.request.intent.slots && event.request.intent.slots.Player
+      && event.request.intent.slots.Player.value) {
       // Force this to player, banker, or tie
-      betOn = context.event.request.intent.slots.Player.value.toLowerCase();
+      betOn = event.request.intent.slots.Player.value.toLowerCase();
       if (betOn == 'dealer') {
         betOn = 'banker';
       } else if ((betOn != 'banker') && (betOn != 'tie')) {
@@ -248,18 +198,18 @@ module.exports = {
     }
 
     if (amount > game.rules.maxBet) {
-      speech = context.t('BET_EXCEEDS_MAX').replace('{0}', game.rules.maxBet);
-      reprompt = context.t('BET_INVALID_REPROMPT');
+      speech = res.strings.BET_EXCEEDS_MAX.replace('{0}', game.rules.maxBet);
+      reprompt = res.strings.BET_INVALID_REPROMPT;
     } else if (amount < game.rules.minBet) {
-      speech = context.t('BET_LESSTHAN_MIN').replace('{0}', game.rules.minBet);
-      reprompt = context.t('BET_INVALID_REPROMPT');
+      speech = res.strings.BET_LESSTHAN_MIN.replace('{0}', game.rules.minBet);
+      reprompt = res.strings.BET_INVALID_REPROMPT;
     } else if (amount > game.bankroll) {
       if (game.bankroll >= game.rules.minBet) {
         amount = game.bankroll;
       } else {
         // Oops, you can't bet this much
-        speech = context.t('BET_EXCEEDS_BANKROLL').replace('{0}', game.bankroll);
-        reprompt = context.t('BET_INVALID_REPROMPT');
+        speech = res.strings.BET_EXCEEDS_BANKROLL.replace('{0}', game.bankroll);
+        reprompt = res.strings.BET_INVALID_REPROMPT;
       }
     }
 
@@ -276,78 +226,70 @@ module.exports = {
 
     return (total % 10);
   },
-  pickRandomOption: function(context, res) {
-    const game = context.attributes[context.attributes.currentGame];
+  drawTable: function(handlerInput, callback) {
+    const response = handlerInput.responseBuilder;
+    const event = handlerInput.requestEnvelope;
+    const attributes = handlerInput.attributesManager.getSessionAttributes();
 
-    if (res && context.t(res)) {
-      const options = context.t(res).split('|');
-      const randomValue = seedrandom(context.event.session.user.userId + (game.timestamp ? game.timestamp : ''))();
-      const choice = Math.floor(randomValue * options.length);
-      if (choice == options.length) {
-        choice--;
+callback();
+return;
+
+    if (event.context && event.context.System &&
+      event.context.System.device &&
+      event.context.System.device.supportedInterfaces &&
+      event.context.System.device.supportedInterfaces.Display) {
+      attributes.display = true;
+      const start = Date.now();
+      const game = attributes[attributes.currentGame];
+      const nextCards = game.deck.slice(0, 6);
+
+      const formData = {
+        dealer: game.dealer ? JSON.stringify(game.dealer) : '[]',
+        player: game.player ? JSON.stringify(game.player) : '[]',
+        nextCards: JSON.stringify(nextCards),
+      };
+      if (game.activePlayer == 'none') {
+        formData.showHoleCard = 'true';
       }
 
-      return options[choice];
+      const params = {
+        url: process.env.SERVICEURL + 'baccarat/drawImage',
+        formData: formData,
+        timeout: 3000,
+      };
+
+      request.post(params, (err, res, body) => {
+        if (err) {
+          console.log(err);
+          callback(err);
+        } else {
+          const imageUrl = JSON.parse(body).file;
+          const end = Date.now();
+          console.log('Drawing table took ' + (end - start) + ' ms');
+
+          response.addRenderTemplateDirective({
+            type: 'BodyTemplate6',
+            backButton: 'HIDDEN',
+            backgroundImage: {sources: [{url: imageUrl, widthPixels: 0, heightPixels: 0}]},
+            title: '',
+          });
+
+          callback();
+        }
+      });
     } else {
-      return undefined;
+      // Not a display device
+      callback();
     }
   },
 };
 
-function buildDisplayTemplate(context, callback) {
-  if (context.event.context &&
-      context.event.context.System.device.supportedInterfaces.Display) {
-    context.attributes.display = true;
-    const start = Date.now();
-    const game = context.attributes[context.attributes.currentGame];
-    const nextCards = game.deck.slice(0, 6);
-
-    const formData = {
-      dealer: game.dealer ? JSON.stringify(game.dealer) : '[]',
-      player: game.player ? JSON.stringify(game.player) : '[]',
-      nextCards: JSON.stringify(nextCards),
-    };
-    if (game.activePlayer == 'none') {
-      formData.showHoleCard = 'true';
-    }
-
-    const params = {
-      url: process.env.SERVICEURL + 'baccarat/drawImage',
-      formData: formData,
-      timeout: 3000,
-    };
-
-    request.post(params, (err, res, body) => {
-      if (err) {
-        console.log(err);
-        callback(err);
-      } else {
-        const imageUrl = JSON.parse(body).file;
-        const end = Date.now();
-        console.log('Drawing table took ' + (end - start) + ' ms');
-
-        // Use this as the background image
-        const builder = new Alexa.templateBuilders.BodyTemplate6Builder();
-        const template = builder.setTitle('')
-                    .setBackgroundImage(makeImage(imageUrl))
-                    .setBackButtonBehavior('HIDDEN')
-                    .build();
-
-        context.response.renderTemplate(template);
-        callback();
-      }
-    });
-  } else {
-    // Not a display device
-    callback();
-  }
-}
-
-function roundPlayers(context, playerCount) {
+function roundPlayers(event, playerCount) {
+  const res = require('./resources')(event.request.locale);
   if (playerCount < 200) {
     return playerCount;
   } else {
     // "Over" to the nearest hundred
-    return context.t('MORE_THAN_PLAYERS').replace('{0}', 100 * Math.floor(playerCount / 100));
+    return res.strings.MORE_THAN_PLAYERS.replace('{0}', 100 * Math.floor(playerCount / 100));
   }
 }

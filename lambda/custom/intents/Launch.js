@@ -4,29 +4,34 @@
 
 'use strict';
 
-const utils = require('../utils');
-
 module.exports = {
-  handleIntent: function() {
-    // Simple - welcome them to the game and have them bet
+  canHandle: function(handlerInput) {
+    return handlerInput.requestEnvelope.session.new ||
+      (handlerInput.requestEnvelope.request.type === 'LaunchRequest');
+  },
+  handle: function(handlerInput) {
+    const event = handlerInput.requestEnvelope;
+    const attributes = handlerInput.attributesManager.getSessionAttributes();
+    const res = require('../resources')(event.request.locale);
+    const game = attributes[attributes.currentGame];
     let speech;
-    const game = this.attributes[this.attributes.currentGame];
 
     // Either welcome or welcome back
     if (game.rounds) {
-      speech = this.t('LAUNCH_WELCOME_BACK').replace('{0}', game.bankroll);
+      speech = res.strings.LAUNCH_WELCOME_BACK.replace('{0}', game.bankroll);
     } else {
-      speech = this.t('LAUNCH_WELCOME');
+      speech = res.strings.LAUNCH_WELCOME;
     }
 
-    if (this.attributes.wasDrunk) {
-      speech += this.t('LAUNCH_SOBER');
-      this.attributes.wasDrunk = undefined;
+    if (attributes.wasDrunk) {
+      speech += res.strings.LAUNCH_SOBER;
+      attributes.wasDrunk = undefined;
     }
 
-    this.handler.state = 'PLAYING';
-    const reprompt = this.t('LAUNCH_REPROMPT');
+    const reprompt = res.strings.LAUNCH_REPROMPT;
     speech += reprompt;
-    utils.emitResponse(this, null, null, speech, reprompt);
+    handlerInput.responseBuilder
+      .speak(speech)
+      .reprompt(reprompt);
   },
 };

@@ -7,10 +7,23 @@
 const utils = require('../utils');
 
 module.exports = {
-  handleIntent: function() {
-    utils.readLeaderBoard(this, (highScores) => {
-      const speech = highScores + '. ' + this.t('HIGHSCORE_REPROMPT');
-      utils.emitResponse(this, null, null, speech, this.t('HIGHSCORE_REPROMPT'));
+  canHandle: function(handlerInput) {
+    const request = handlerInput.requestEnvelope.request;
+
+    return ((request.type === 'IntentRequest') && (request.intent.name === 'HighScoreIntent'));
+  },
+  handle: function(handlerInput) {
+    const event = handlerInput.requestEnvelope;
+    const res = require('../resources')(event.request.locale);
+
+    return new Promise((resolve, reject) => {
+      utils.readLeaderBoard(handlerInput, (highScores) => {
+        const speech = highScores + '. ' + res.strings.HIGHSCORE_REPROMPT;
+        handlerInput.responseBuilder
+          .speak(speech)
+          .reprompt(res.strings.HIGHSCORE_REPROMPT);
+        resolve();
+      });
     });
   },
 };

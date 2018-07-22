@@ -4,33 +4,38 @@
 
 'use strict';
 
-const utils = require('../utils');
-
 module.exports = {
-  handleIntent: function() {
-    if (!this.attributes.temp.martini) {
-      this.attributes.temp.coffee = (this.attributes.temp.coffee + 1) || 1;
-      if (!this.attributes.maxCoffee || (this.attributes.temp.coffee > this.attributes.maxCoffee)) {
-        this.attributes.maxCoffee = this.attributes.temp.coffee;
+  canHandle: function(handlerInput) {
+    const request = handlerInput.requestEnvelope.request;
+
+    return ((request.type === 'IntentRequest') && (request.intent.name === 'OrderCoffeeIntent'));
+  },
+  handle: function(handlerInput) {
+    const event = handlerInput.requestEnvelope;
+    const attributes = handlerInput.attributesManager.getSessionAttributes();
+    const res = require('../resources')(event.request.locale);
+
+    if (!attributes.temp.martini) {
+      attributes.temp.coffee = (attributes.temp.coffee + 1) || 1;
+      if (!attributes.maxCoffee || (attributes.temp.coffee > attributes.maxCoffee)) {
+        attributes.maxCoffee = attributes.temp.coffee;
       }
     }
-    this.attributes.wasDrunk = undefined;
+    attributes.wasDrunk = undefined;
 
-    let reprompt = (this.attributes.temp.reprompt ? this.attributes.temp.reprompt : this.t('COFFEE_REPROMPT'));
-    reprompt = removeCoffee(this, reprompt);
-    const speech = (this.attributes.temp.martini ? this.t('COFFEE_DRINK_SOBER') : this.t('COFFEE_DRINK')) + reprompt;
-    this.attributes.temp.martini = 0;
+    let reprompt = (attributes.temp.reprompt
+      ? attributes.temp.reprompt
+      : res.strings.COFFEE_REPROMPT);
+    if (reprompt.indexOf(res.strings.COFFEE) > -1) {
+      reprompt = res.strings.COFFEE_REPROMPT;
+    }
+    const speech = (attributes.temp.martini
+      ? res.strings.COFFEE_DRINK_SOBER
+      : res.strings.COFFEE_DRINK) + reprompt;
+    attributes.temp.martini = 0;
 
-    utils.emitResponse(this, null, null, speech, reprompt);
+    handlerInput.responseBuilder
+      .speak(speech)
+      .reprompt(reprompt);
   },
 };
-
-function removeCoffee(context, text) {
-  let newText = text;
-
-  if (text.indexOf(context.t('COFFEE')) > -1) {
-    newText = context.t('COFFEE_REPROMPT');
-  }
-
-  return newText;
-}
