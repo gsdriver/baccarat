@@ -28,7 +28,9 @@ const requestInterceptor = {
       const sessionAttributes = attributesManager.getSessionAttributes();
       const event = handlerInput.requestEnvelope;
 
-      if (Object.keys(sessionAttributes).length === 0) {
+      if ((Object.keys(sessionAttributes).length === 0) ||
+        ((Object.keys(sessionAttributes).length === 1)
+          && sessionAttributes.bot)) {
         // No session attributes - so get the persistent ones
         attributesManager.getPersistentAttributes()
           .then((attributes) => {
@@ -44,6 +46,7 @@ const requestInterceptor = {
             // round of the session - set the temp attributes
             attributes.temp = {};
             attributes.sessions = (attributes.sessions + 1) || 1;
+            attributes.bot = sessionAttributes.bot;
             attributesManager.setSessionAttributes(attributes);
             responseBuilder = handlerInput.responseBuilder;
             resolve();

@@ -57,8 +57,18 @@ function passToAlexa(intentRequest, intentName, callback) {
       'timestamp': Date.now(),
     },
     'version': '1.0',
+    'context': {
+      'System': {
+        'application': {
+          'applicationId': 'amzn1.ask.skill.5e88f594-31a0-4d86-9a67-1aee5d717c19'
+        },
+        'user': {
+          'userId': 'LEX-' + intentRequest.userId,
+        },
+      }
+    },
   };
-
+  
   // Is this a LaunchRequest or intent?
   if (intentName == 'LaunchRequest') {
     lambda.request.type = 'LaunchRequest';
@@ -95,7 +105,7 @@ function passToAlexa(intentRequest, intentName, callback) {
   }
 
   const start = Date.now();
-  Lambda.invoke({FunctionName: 'Baccarat', Payload: JSON.stringify(lambda)}, (err, data) => {
+  Lambda.invoke({FunctionName: 'Baccarat2', Payload: JSON.stringify(lambda)}, (err, data) => {
     console.log('Invoking Lambda took ' + (Date.now() - start) + ' ms');
     if (err) {
       console.log(err);
