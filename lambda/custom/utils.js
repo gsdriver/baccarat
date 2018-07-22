@@ -231,9 +231,6 @@ module.exports = {
     const event = handlerInput.requestEnvelope;
     const attributes = handlerInput.attributesManager.getSessionAttributes();
 
-callback();
-return;
-
     if (event.context && event.context.System &&
       event.context.System.device &&
       event.context.System.device.supportedInterfaces &&
