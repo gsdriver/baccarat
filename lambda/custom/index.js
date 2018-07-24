@@ -129,7 +129,7 @@ function runGame(event, context, callback) {
     .addErrorHandlers(ErrorHandler)
     .addRequestInterceptors(requestInterceptor)
     .addResponseInterceptors(saveResponseInterceptor)
-    .withTableName('Baccarat2')
+    .withTableName('Baccarat')
     .withAutoCreateTable(true)
     .withSkillId('amzn1.ask.skill.5e88f594-31a0-4d86-9a67-1aee5d717c19')
     .lambda();
