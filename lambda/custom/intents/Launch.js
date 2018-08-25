@@ -30,8 +30,9 @@ module.exports = {
 
     const reprompt = res.strings.LAUNCH_REPROMPT;
     speech += reprompt;
-    handlerInput.responseBuilder
+    return handlerInput.responseBuilder
       .speak(speech)
-      .reprompt(reprompt);
+      .reprompt(reprompt)
+      .getResponse();
   },
 };

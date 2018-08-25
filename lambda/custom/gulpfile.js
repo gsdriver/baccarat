@@ -4,7 +4,11 @@ const gulp = require('gulp');
 const eslint = require('gulp-eslint');
 const del = require('del');
 
-gulp.task('build:prepare', ['clean'], () =>
+gulp.task('clean', () => {
+  return del(['build/']);
+});
+
+gulp.task('build:prepare', gulp.series('clean'), () =>
   // copy only what we need for deployment
   gulp.src(['**/*', '!build/**', '!.git', '!.git/**', '!package.json', '!README.md',
       '!speechAssets', '!speechAssets/**', '!.gitignore', '!lex', '!lex/**',
@@ -20,9 +24,5 @@ gulp.task('lint', () =>
     .pipe(eslint.failAfterError())
 );
 
-gulp.task('clean', () => {
-  return del(['build/']);
-});
-
-gulp.task('build', ['clean', 'lint']);
-gulp.task('default', ['build']);
+gulp.task('build', gulp.series('clean', 'lint'));
+gulp.task('default', gulp.series('build'));

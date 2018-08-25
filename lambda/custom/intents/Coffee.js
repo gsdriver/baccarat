@@ -34,8 +34,9 @@ module.exports = {
       : res.strings.COFFEE_DRINK) + reprompt;
     attributes.temp.martini = 0;
 
-    handlerInput.responseBuilder
+    return handlerInput.responseBuilder
       .speak(speech)
-      .reprompt(reprompt);
+      .reprompt(reprompt)
+      .getResponse();
   },
 };

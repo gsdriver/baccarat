@@ -19,10 +19,11 @@ module.exports = {
     return new Promise((resolve, reject) => {
       utils.readLeaderBoard(handlerInput, (highScores) => {
         const speech = highScores + '. ' + res.strings.HIGHSCORE_REPROMPT;
-        handlerInput.responseBuilder
+        const response = handlerInput.responseBuilder
           .speak(speech)
-          .reprompt(res.strings.HIGHSCORE_REPROMPT);
-        resolve();
+          .reprompt(res.strings.HIGHSCORE_REPROMPT)
+          .getResponse();
+        resolve(response);
       });
     });
   },
