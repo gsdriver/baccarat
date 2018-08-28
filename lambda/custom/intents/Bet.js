@@ -91,7 +91,6 @@ module.exports = {
       } else {
         speech += getDrunkOption(event, attributes, 'BET_PLAYER_STAND');
       }
-    }
 
       // What does the banker do?
       let dealerDraw = false;

@@ -21,6 +21,7 @@ module.exports = {
 
     if (!attributes.temp.coffee) {
       attributes.temp.martini = (attributes.temp.martini + 1) || 1;
+      attributes.wasDrunk = true;
       if (!attributes.maxMartini || (attributes.temp.martini > attributes.maxMartini)) {
         attributes.maxMartini = attributes.temp.martini;
       }
