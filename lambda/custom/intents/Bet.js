@@ -24,157 +24,157 @@ module.exports = {
     // of either the last bet amount or the minimum bet
     // The player is also optional - if not present we use the last bet or
     // assume that they want to bet on the player
-    utils.getBetAmount(event, attributes, (amount, betOn, speechError, repromptError) => {
-      if (speechError) {
-        handlerInput.responseBuilder
-          .speak(speechError)
-          .reprompt(repromptError);
-        return;
-      }
+    const output = utils.getBetAmount(event, attributes);
+    if (output.speech) {
+      return handlerInput.responseBuilder
+        .speak(output.speech)
+        .reprompt(output.reprompt)
+        .getResponse();
+    }
 
-      let speech = '';
-      const game = attributes[attributes.currentGame];
-      if ((game.bet !== amount) || (game.betOn !== betOn)) {
-        speech += getDrunkOption(event, attributes, 'BET_CARDS_SAYBET')
-            .replace('{0}', amount)
-            .replace('{1}', utils.sayBetOn(event, betOn))
-            .replace('{2}', Math.floor(amount * 1.75));
-      }
+    let speech = '';
+    const game = attributes[attributes.currentGame];
+    if ((game.bet !== output.amount) || (game.betOn !== output.betOn)) {
+      speech += getDrunkOption(event, attributes, 'BET_CARDS_SAYBET')
+          .replace('{0}', output.amount)
+          .replace('{1}', utils.sayBetOn(event, output.betOn))
+          .replace('{2}', Math.floor(output.amount * 1.75));
+    }
 
-      // Save the new bet information
-      game.bet = amount;
-      game.betOn = betOn;
-      game.bankroll -= game.bet;
-      game.timestamp = Date.now();
-      game.rounds = (game.rounds + 1) || 1;
+    // Save the new bet information
+    game.bet = output.amount;
+    game.betOn = output.betOn;
+    game.bankroll -= game.bet;
+    game.timestamp = Date.now();
+    game.rounds = (game.rounds + 1) || 1;
 
-      // If fewer than 8 cards, shuffle
-      if (game.deck.length < 8) {
-        utils.shuffleDeck(game, event.session.user.userId);
-      }
+    // If fewer than 8 cards, shuffle
+    if (game.deck.length < 8) {
+      utils.shuffleDeck(game, event.session.user.userId);
+    }
 
-      // Deal two cards to each player
-      game.player = [];
-      game.dealer = [];
-      game.player.push(game.deck.shift());
-      game.dealer.push(game.deck.shift());
-      game.player.push(game.deck.shift());
-      game.dealer.push(game.deck.shift());
+    // Deal two cards to each player
+    game.player = [];
+    game.dealer = [];
+    game.player.push(game.deck.shift());
+    game.dealer.push(game.deck.shift());
+    game.player.push(game.deck.shift());
+    game.dealer.push(game.deck.shift());
 
-      let playerTotal = utils.handTotal(game.player);
-      let dealerTotal = utils.handTotal(game.dealer);
+    let playerTotal = utils.handTotal(game.player);
+    let dealerTotal = utils.handTotal(game.dealer);
 
-      // Let them know what they got
-      speech += getDrunkOption(event, attributes, 'BET_PLAYER_CARDS')
-          .replace('{0}', utils.sayCard(event, game.player[0]))
-          .replace('{1}', utils.sayCard(event, game.player[1]))
-          .replace('{2}', playerTotal)
-          .replace('{3}', (playerTotal + 2) % 10)
-          .replace('{4}', utils.sayCard(event, game.dealer[0]));
-      speech += getDrunkOption(event, attributes, 'BET_DEALER_CARDS')
-          .replace('{0}', utils.sayCard(event, game.dealer[0]))
-          .replace('{1}', utils.sayCard(event, game.dealer[1]))
-          .replace('{2}', dealerTotal);
+    // Let them know what they got
+    speech += getDrunkOption(event, attributes, 'BET_PLAYER_CARDS')
+        .replace('{0}', utils.sayCard(event, game.player[0]))
+        .replace('{1}', utils.sayCard(event, game.player[1]))
+        .replace('{2}', playerTotal)
+        .replace('{3}', (playerTotal + 2) % 10)
+        .replace('{4}', utils.sayCard(event, game.dealer[0]));
+    speech += getDrunkOption(event, attributes, 'BET_DEALER_CARDS')
+        .replace('{0}', utils.sayCard(event, game.dealer[0]))
+        .replace('{1}', utils.sayCard(event, game.dealer[1]))
+        .replace('{2}', dealerTotal);
 
-      // Now, if either player or banker have 8 or 9, then we are done
-      if ((playerTotal < 8) && (dealerTotal < 8)) {
-        // Does the player hit or stand?
-        let playerCard = 0;
-        if (playerTotal < 6) {
-          game.player.push(game.deck.shift());
-          playerCard = game.player[2].rank;
-          playerTotal = utils.handTotal(game.player);
-          speech += getDrunkOption(event, attributes, 'BET_NEXT_PLAYERCARD')
-              .replace('{0}', utils.sayCard(event, game.player[2]))
-              .replace('{1}', playerTotal)
-              .replace('{2}', utils.sayCard(event, {rank: game.dealer[1].rank, suit: 'H'}));
-        } else {
-          speech += getDrunkOption(event, attributes, 'BET_PLAYER_STAND');
-        }
-
-        // What does the banker do?
-        let dealerDraw = false;
-        switch (dealerTotal) {
-          case 0:
-          case 1:
-          case 2:
-            // Draw no matter what
-            dealerDraw = true;
-            break;
-          case 3:
-            // Draw unless third card is an 8
-            dealerDraw = (playerCard != 8);
-            break;
-          case 4:
-            // Draw if third card was 2-7 (or none at all)
-            dealerDraw = (playerCard == 0) || ((playerCard >= 2) && (playerCard <= 7));
-            break;
-          case 5:
-            // Draw if third card was 4-7 (or none at all)
-            dealerDraw = (playerCard == 0) || ((playerCard >= 4) && (playerCard <= 7));
-            break;
-          case 6:
-            // Draw if the third card was 6 or 7
-            dealerDraw = (playerCard == 6) || (playerCard == 7);
-            break;
-          default:
-            // Everything else, stand
-            break;
-        }
-
-        if (dealerDraw) {
-          game.dealer.push(game.deck.shift());
-          dealerTotal = utils.handTotal(game.dealer);
-          speech += getDrunkOption(event, attributes, 'BET_NEXT_DEALERCARD')
-              .replace('{0}', utils.sayCard(event, game.dealer[2]))
-              .replace('{1}', dealerTotal);
-        } else {
-          speech += getDrunkOption(event, attributes, 'BET_DEALER_STAND');
-        }
-      }
-
-      // OK, so ... who won?
-      let winner;
-      if (dealerTotal > playerTotal) {
-        winner = (game.betOn == 'banker');
-      } else if (playerTotal > dealerTotal) {
-        winner = (game.betOn == 'player');
+    // Now, if either player or banker have 8 or 9, then we are done
+    if ((playerTotal < 8) && (dealerTotal < 8)) {
+      // Does the player hit or stand?
+      let playerCard = 0;
+      if (playerTotal < 6) {
+        game.player.push(game.deck.shift());
+        playerCard = game.player[2].rank;
+        playerTotal = utils.handTotal(game.player);
+        speech += getDrunkOption(event, attributes, 'BET_NEXT_PLAYERCARD')
+            .replace('{0}', utils.sayCard(event, game.player[2]))
+            .replace('{1}', playerTotal)
+            .replace('{2}', utils.sayCard(event, {rank: game.dealer[1].rank, suit: 'H'}));
       } else {
-        winner = (game.betOn == 'tie');
+        speech += getDrunkOption(event, attributes, 'BET_PLAYER_STAND');
       }
 
-      if (winner) {
-        if (dealerTotal == playerTotal) {
-          game.bankroll += (game.rules.tieBet + 1) * game.bet;
-          speech += getDrunkOption(event, attributes, 'BET_WIN_TIE').replace('{0}', game.rules.tieBet * game.bet);
-        } else {
-          game.bankroll += 2 * game.bet;
-          if ((game.betOn == 'banker') && game.rules.commission) {
-            // Commission
-            game.bankroll -= (game.rules.commission * game.bet);
-          }
-          speech += getDrunkOption(event, attributes, 'BET_WIN');
-        }
-      } else if (dealerTotal == playerTotal) {
-        // It's a tie and you didn't bet on it - so no winner
-        game.bankroll += game.bet;
-        speech += getDrunkOption(event, attributes, 'BET_TIE');
+      // What does the banker do?
+      let dealerDraw = false;
+      switch (dealerTotal) {
+        case 0:
+        case 1:
+        case 2:
+          // Draw no matter what
+          dealerDraw = true;
+          break;
+        case 3:
+          // Draw unless third card is an 8
+          dealerDraw = (playerCard != 8);
+          break;
+        case 4:
+          // Draw if third card was 2-7 (or none at all)
+          dealerDraw = (playerCard == 0) || ((playerCard >= 2) && (playerCard <= 7));
+          break;
+        case 5:
+          // Draw if third card was 4-7 (or none at all)
+          dealerDraw = (playerCard == 0) || ((playerCard >= 4) && (playerCard <= 7));
+          break;
+        case 6:
+          // Draw if the third card was 6 or 7
+          dealerDraw = (playerCard == 6) || (playerCard == 7);
+          break;
+        default:
+          // Everything else, stand
+          break;
+      }
+
+      if (dealerDraw) {
+        game.dealer.push(game.deck.shift());
+        dealerTotal = utils.handTotal(game.dealer);
+        speech += getDrunkOption(event, attributes, 'BET_NEXT_DEALERCARD')
+            .replace('{0}', utils.sayCard(event, game.dealer[2]))
+            .replace('{1}', dealerTotal);
       } else {
-        speech += getDrunkOption(event, attributes, 'BET_LOSE');
+        speech += getDrunkOption(event, attributes, 'BET_DEALER_STAND');
       }
+    }
 
-      // Reset bankroll if necessary
-      if ((game.bankroll < game.rules.minBet) && game.rules.canReset) {
-        game.bankroll = game.startingBankroll;
-        speech += res.strings.RESET_BANKROLL.replace('{0}', game.bankroll);
+    // OK, so ... who won?
+    let winner;
+    if (dealerTotal > playerTotal) {
+      winner = (game.betOn == 'banker');
+    } else if (playerTotal > dealerTotal) {
+      winner = (game.betOn == 'player');
+    } else {
+      winner = (game.betOn == 'tie');
+    }
+
+    if (winner) {
+      if (dealerTotal == playerTotal) {
+        game.bankroll += (game.rules.tieBet + 1) * game.bet;
+        speech += getDrunkOption(event, attributes, 'BET_WIN_TIE').replace('{0}', game.rules.tieBet * game.bet);
+      } else {
+        game.bankroll += 2 * game.bet;
+        if ((game.betOn == 'banker') && game.rules.commission) {
+          // Commission
+          game.bankroll -= (game.rules.commission * game.bet);
+        }
+        speech += getDrunkOption(event, attributes, 'BET_WIN');
       }
+    } else if (dealerTotal == playerTotal) {
+      // It's a tie and you didn't bet on it - so no winner
+      game.bankroll += game.bet;
+      speech += getDrunkOption(event, attributes, 'BET_TIE');
+    } else {
+      speech += getDrunkOption(event, attributes, 'BET_LOSE');
+    }
 
-      const reprompt = getDrunkOption(event, attributes, 'BET_PLAY_AGAIN');
-      speech += reprompt;
-      handlerInput.responseBuilder
-        .speak(speech)
-        .reprompt(reprompt);
-    });
+    // Reset bankroll if necessary
+    if ((game.bankroll < game.rules.minBet) && game.rules.canReset) {
+      game.bankroll = game.startingBankroll;
+      speech += res.strings.RESET_BANKROLL.replace('{0}', game.bankroll);
+    }
+
+    const reprompt = getDrunkOption(event, attributes, 'BET_PLAY_AGAIN');
+    speech += reprompt;
+    return handlerInput.responseBuilder
+      .speak(speech)
+      .reprompt(reprompt)
+      .getResponse();
   },
 };
 

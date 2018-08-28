@@ -130,7 +130,7 @@ module.exports = {
     const players = JSON.parse(res.strings.BETON_OPTIONS);
     return (players[betOn]) ? players[betOn] : betOn;
   },
-  readHand: function(event, attributes, readBankroll, callback) {
+  readHand: function(event, attributes, readBankroll) {
     const res = require('./resources')(event.request.locale);
     let speech = '';
     let reprompt = '';
@@ -158,9 +158,9 @@ module.exports = {
       reprompt = res.strings.GENERIC_REPROMPT;
     }
 
-    callback(speech, reprompt);
+    return {speech: speech, reprompt: reprompt};
   },
-  getBetAmount: function(event, attributes, callback) {
+  getBetAmount: function(event, attributes) {
     let reprompt;
     let speech;
     let amount;
@@ -213,7 +213,7 @@ module.exports = {
       }
     }
 
-    callback(amount, betOn, speech, reprompt);
+    return {amount: amount, betOn: betOn, speech: speech, reprompt: reprompt};
   },
   handTotal: function(cards) {
     // Total is between 0 and 9

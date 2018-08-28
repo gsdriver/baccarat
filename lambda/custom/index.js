@@ -19,8 +19,6 @@ const SessionEnd = require('./intents/SessionEnd');
 const utils = require('./utils');
 const request = require('request');
 
-let responseBuilder;
-
 const requestInterceptor = {
   process(handlerInput) {
     return new Promise((resolve, reject) => {
@@ -48,14 +46,12 @@ const requestInterceptor = {
             attributes.sessions = (attributes.sessions + 1) || 1;
             attributes.bot = sessionAttributes.bot;
             attributesManager.setSessionAttributes(attributes);
-            responseBuilder = handlerInput.responseBuilder;
             resolve();
           })
           .catch((error) => {
             reject(error);
           });
       } else {
-        responseBuilder = handlerInput.responseBuilder;
         resolve();
       }
     });
@@ -134,9 +130,6 @@ function runGame(event, context, callback) {
     .withSkillId('amzn1.ask.skill.5e88f594-31a0-4d86-9a67-1aee5d717c19')
     .lambda();
   skillFunction(event, context, (err, response) => {
-    if (response) {
-      response.response = responseBuilder.getResponse();
-    }
     callback(err, response);
   });
 }
