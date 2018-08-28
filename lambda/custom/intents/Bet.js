@@ -24,26 +24,26 @@ module.exports = {
     // of either the last bet amount or the minimum bet
     // The player is also optional - if not present we use the last bet or
     // assume that they want to bet on the player
-    const output = utils.getBetAmount(event, attributes);
-    if (output.speech) {
+    const bet = getBetAmount(event, attributes);
+    if (bet.speechError) {
       return handlerInput.responseBuilder
-        .speak(output.speech)
-        .reprompt(output.reprompt)
+        .speak(bet.speechError)
+        .reprompt(bet.repromptError)
         .getResponse();
     }
 
     let speech = '';
     const game = attributes[attributes.currentGame];
-    if ((game.bet !== output.amount) || (game.betOn !== output.betOn)) {
+    if ((game.bet !== bet.amount) || (game.betOn !== bet.betOn)) {
       speech += getDrunkOption(event, attributes, 'BET_CARDS_SAYBET')
-          .replace('{0}', output.amount)
-          .replace('{1}', utils.sayBetOn(event, output.betOn))
-          .replace('{2}', Math.floor(output.amount * 1.75));
+          .replace('{0}', bet.amount)
+          .replace('{1}', utils.sayBetOn(event, bet.betOn))
+          .replace('{2}', Math.floor(bet.amount * 1.75));
     }
 
     // Save the new bet information
-    game.bet = output.amount;
-    game.betOn = output.betOn;
+    game.bet = bet.amount;
+    game.betOn = bet.betOn;
     game.bankroll -= game.bet;
     game.timestamp = Date.now();
     game.rounds = (game.rounds + 1) || 1;
@@ -91,6 +91,7 @@ module.exports = {
       } else {
         speech += getDrunkOption(event, attributes, 'BET_PLAYER_STAND');
       }
+    }
 
       // What does the banker do?
       let dealerDraw = false;
@@ -177,6 +178,67 @@ module.exports = {
       .getResponse();
   },
 };
+
+function getBetAmount(event, attributes) {
+  let reprompt;
+  let speech;
+  let amount;
+  let betOn;
+  const game = attributes[attributes.currentGame];
+  const res = require('../resources')(event.request.locale);
+
+  if (event.request.intent.slots && event.request.intent.slots.Amount
+    && event.request.intent.slots.Amount.value) {
+    amount = parseInt(event.request.intent.slots.Amount.value);
+  } else if (game.bet) {
+    amount = game.bet;
+  } else {
+    amount = game.minBet;
+  }
+
+  if (event.request.intent.slots && event.request.intent.slots.Player
+    && event.request.intent.slots.Player.value) {
+    // Force this to player, banker, or tie
+    betOn = event.request.intent.slots.Player.value.toLowerCase();
+    if (betOn == 'dealer') {
+      betOn = 'banker';
+    } else if ((betOn != 'banker') && (betOn != 'tie')) {
+      betOn = 'player';
+    }
+  } else if (game.betOn) {
+    betOn = game.betOn;
+  } else {
+    betOn = 'player';
+  }
+
+  // If we didn't get the amount, just make it a minimum bet
+  if (isNaN(amount) || (amount == 0)) {
+    amount = game.rules.minBet;
+  }
+
+  if (amount > game.rules.maxBet) {
+    speech = res.strings.BET_EXCEEDS_MAX.replace('{0}', game.rules.maxBet);
+    reprompt = res.strings.BET_INVALID_REPROMPT;
+  } else if (amount < game.rules.minBet) {
+    speech = res.strings.BET_LESSTHAN_MIN.replace('{0}', game.rules.minBet);
+    reprompt = res.strings.BET_INVALID_REPROMPT;
+  } else if (amount > game.bankroll) {
+    if (game.bankroll >= game.rules.minBet) {
+      amount = game.bankroll;
+    } else {
+      // Oops, you can't bet this much
+      speech = res.strings.BET_EXCEEDS_BANKROLL.replace('{0}', game.bankroll);
+      reprompt = res.strings.BET_INVALID_REPROMPT;
+    }
+  }
+
+  return({
+    amount: amount,
+    betOn: betOn,
+    speechError: speech,
+    repromptError: reprompt,
+  });
+}
 
 function getDrunkOption(event, attributes, value) {
   const res = require('../resources')(event.request.locale);
