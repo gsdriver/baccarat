@@ -18,6 +18,7 @@ const Unhandled = require('./intents/Unhandled');
 const SessionEnd = require('./intents/SessionEnd');
 const utils = require('./utils');
 const request = require('request');
+const buttons = require('./buttons');
 
 const requestInterceptor = {
   process(handlerInput) {
@@ -43,6 +44,7 @@ const requestInterceptor = {
             // Since there were no session attributes, this is the first
             // round of the session - set the temp attributes
             attributes.temp = {};
+            attributes.temp.newSession = true;
             attributes.sessions = (attributes.sessions + 1) || 1;
             attributes.bot = sessionAttributes.bot;
             attributesManager.setSessionAttributes(attributes);
@@ -62,8 +64,16 @@ const saveResponseInterceptor = {
   process(handlerInput) {
     return new Promise((resolve, reject) => {
       const response = handlerInput.responseBuilder.getResponse();
+      const attributes = handlerInput.attributesManager.getSessionAttributes();
 
       if (response) {
+        if (attributes.temp.newSession) {
+          // Set up the buttons to all flash, welcoming the user to press a button
+          buttons.addLaunchAnimation(handlerInput);
+          buttons.buildButtonDownAnimationDirective(handlerInput, []);
+          buttons.startInputHandler(handlerInput);
+          attributes.temp.newSession = undefined;
+        }
         utils.drawTable(handlerInput, () => {
           if (response.shouldEndSession) {
             // We are meant to end the session
