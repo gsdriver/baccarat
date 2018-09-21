@@ -98,7 +98,7 @@ if (process.env.DASHBOTKEY) {
 }
 
 function runGame(event, context, callback) {
-  const skillBuilder = Alexa.SkillBuilders.standard();
+  const skillBuilder = Alexa.SkillBuilders.custom();
 
   if (!process.env.NOLOG) {
     console.log(JSON.stringify(event));
@@ -110,6 +110,12 @@ function runGame(event, context, callback) {
     return;
   }
 
+  const {DynamoDbPersistenceAdapter} = require('ask-sdk-dynamodb-persistence-adapter');
+  const dbAdapter = new DynamoDbPersistenceAdapter({
+    tableName: 'Baccarat',
+    partitionKeyName: 'userId',
+    attributesName: 'mapAttr',
+  });
   const skillFunction = skillBuilder.addRequestHandlers(
       Launch,
       Martini,
@@ -125,8 +131,7 @@ function runGame(event, context, callback) {
     .addErrorHandlers(ErrorHandler)
     .addRequestInterceptors(requestInterceptor)
     .addResponseInterceptors(saveResponseInterceptor)
-    .withTableName('Baccarat')
-    .withAutoCreateTable(true)
+    .withPersistenceAdapter(dbAdapter)
     .withSkillId('amzn1.ask.skill.5e88f594-31a0-4d86-9a67-1aee5d717c19')
     .lambda();
   skillFunction(event, context, (err, response) => {
