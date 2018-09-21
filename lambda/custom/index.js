@@ -48,6 +48,10 @@ const requestInterceptor = {
             attributes.temp.newSession = true;
             attributes.sessions = (attributes.sessions + 1) || 1;
             attributes.bot = sessionAttributes.bot;
+
+            // Clear the bet and establish if we can have martinis
+            attributes[attributes.currentGame].bet = undefined;
+            attributes[attributes.currentGame].betOn = undefined;
             attributes.canHaveMartini = (event.request.locale === 'en-US');
             attributesManager.setSessionAttributes(attributes);
             resolve();

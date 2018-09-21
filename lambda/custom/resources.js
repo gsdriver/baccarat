@@ -17,6 +17,7 @@ const common = {
   'BET_WIN': 'You win! |You win! |Oh, more money! |Why are there more chips? ',
   'BET_LOSE': 'You lost! |You lost! |Where did my money go? ',
   'BET_TIE': 'It\'s a tie <break time=\'200ms\'/> no winner. |It\'s a tie <break time=\'200ms\'/> no winner. |Wait, what happened? ',
+  'BET_AMOUNT': 'How much would you like to bet? ',
   // From Coffee.js
   'COFFEE_DRINK': 'Nothing like a strong cup of joe. ',
   'COFFEE_DRINK_SOBER': 'Whew, that cleared my head. ',

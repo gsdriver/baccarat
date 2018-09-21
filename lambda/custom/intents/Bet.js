@@ -6,13 +6,28 @@
 
 const utils = require('../utils');
 const seedrandom = require('seedrandom');
+const buttons = require('../buttons');
 
 module.exports = {
   canHandle: function(handlerInput) {
     const request = handlerInput.requestEnvelope.request;
+    const attributes = handlerInput.attributesManager.getSessionAttributes();
+
+    if (request.type === 'GameEngine.InputHandlerEvent') {
+      // Did they press while on the order martini color?
+      const intent = buttons.getButtonIntent(request);
+      if (intent === 'bet_player_event') {
+        attributes.temp.buttonBetOn = 'player';
+        return true;
+      } else if (intent === 'bet_banker_event') {
+        attributes.temp.buttonBetOn = 'banker';
+        return true;
+      }
+    }
 
     return ((request.type === 'IntentRequest') &&
       ((request.intent.name === 'BetIntent') ||
+      (request.intent.name === 'DollarAmountIntent') ||
       (request.intent.name === 'AMAZON.YesIntent')));
   },
   handle: function(handlerInput) {
@@ -26,6 +41,10 @@ module.exports = {
     // assume that they want to bet on the player
     const bet = getBetAmount(event, attributes);
     if (bet.speechError) {
+      if (attributes.temp.buttonId) {
+        buttons.stopInputHandler(handlerInput);
+        buttons.colorButton(handlerInput, attributes.temp.buttonId, 'CC0000');
+      }
       return handlerInput.responseBuilder
         .speak(bet.speechError)
         .reprompt(bet.repromptError)
@@ -33,6 +52,7 @@ module.exports = {
     }
 
     attributes.temp.newGame = undefined;
+    attributes.temp.buttonBetOn = undefined;
     let speech = '';
     const game = attributes[attributes.currentGame];
     if ((game.bet !== bet.amount) || (game.betOn !== bet.betOn)) {
@@ -170,6 +190,12 @@ module.exports = {
       speech += res.strings.RESET_BANKROLL.replace('{0}', game.bankroll);
     }
 
+    // Set button animation and input
+    if (attributes.temp.buttonId) {
+      buttons.betInputHandler(handlerInput);
+      buttons.addBetAnimation(handlerInput, [attributes.temp.buttonId]);
+    }
+
     const reprompt = getDrunkOption(event, attributes, 'BET_PLAY_AGAIN');
     speech += reprompt;
     return handlerInput.responseBuilder
@@ -187,16 +213,20 @@ function getBetAmount(event, attributes) {
   const game = attributes[attributes.currentGame];
   const res = require('../resources')(event.request.locale);
 
-  if (event.request.intent.slots && event.request.intent.slots.Amount
+  if (event.request.intent && event.request.intent.slots
+    && event.request.intent.slots.Amount
     && event.request.intent.slots.Amount.value) {
     amount = parseInt(event.request.intent.slots.Amount.value);
   } else if (game.bet) {
     amount = game.bet;
   } else {
-    amount = game.minBet;
+    // We'll ask how much they want to bet
+    speech = res.strings.BET_AMOUNT;
+    reprompt = res.strings.BET_AMOUNT;
   }
 
-  if (event.request.intent.slots && event.request.intent.slots.Player
+  if (event.request.intent && event.request.intent.slots
+    && event.request.intent.slots.Player
     && event.request.intent.slots.Player.value) {
     // Force this to player, banker, or tie
     betOn = event.request.intent.slots.Player.value.toLowerCase();
@@ -207,6 +237,8 @@ function getBetAmount(event, attributes) {
     }
   } else if (game.betOn) {
     betOn = game.betOn;
+  } else if (attributes.temp.buttonBetOn) {
+    betOn = attributes.temp.buttonBetOn;
   } else {
     betOn = 'player';
   }

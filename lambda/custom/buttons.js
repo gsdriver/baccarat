@@ -4,10 +4,11 @@
 
 'use strict';
 
+const PLAYER_BET_COLOR = '00008B'; // Blue
+const MARTINI_BET_COLOR = '90EE90'; // Green
+const DEALER_BET_COLOR = 'FFA500'; // Red
+
 module.exports = {
-  playerBetColor: '00008B',
-  martiniColor: '90EE90',
-  dealerBetColor: 'FFA500',
   supportButtons: function(handlerInput) {
     const localeList = ['en-US', 'en-GB', 'de-DE'];
     const attributes = handlerInput.attributesManager.getSessionAttributes();
@@ -17,7 +18,7 @@ module.exports = {
       (localeList.indexOf(locale) >= 0) &&
       (attributes.platform !== 'google') && !attributes.bot);
   },
-  getPressedButton: function(request, attributes) {
+  getPressedButton: function(request) {
     const gameEngineEvents = request.events || [];
     let buttonId;
 
@@ -35,9 +36,37 @@ module.exports = {
 
     return buttonId;
   },
+  getButtonIntent: function(request) {
+    const gameEngineEvents = request.events || [];
+    const events = ['bet_player_event', 'bet_banker_event', 'order_martini_event'];
+    let event;
+
+    gameEngineEvents.forEach((engineEvent) => {
+      // in this request type, we'll see one or more incoming events
+      // corresponding to the StartInputHandler we sent above
+      if (events.indexOf(engineEvent.name) > -1) {
+        console.log('Received ' + engineEvent.name);
+        event = engineEvent.name;
+      }
+    });
+
+    return event;
+  },
+  stopInputHandler: function(handlerInput) {
+    const attributes = handlerInput.attributesManager.getSessionAttributes();
+
+    if (attributes.temp.inputHandlerRequestId) {
+      handlerInput.responseBuilder.addDirective({
+        'type': 'GameEngine.StopInputHandler',
+        'originatingRequestId': attributes.temp.inputHandlerRequestId,
+      });
+    }
+  },
   startInputHandler: function(handlerInput) {
     if (module.exports.supportButtons(handlerInput)) {
       // We'll allow them to press the button again if we haven't already
+      const request = handlerInput.requestEnvelope.request;
+      const attributes = handlerInput.attributesManager.getSessionAttributes();
       const inputDirective = {
         'type': 'GameEngine.StartInputHandler',
         'timeout': 30000,
@@ -60,6 +89,7 @@ module.exports = {
         },
       };
       handlerInput.responseBuilder.addDirective(inputDirective);
+      attributes.temp.inputHandlerRequestId = request.requestId;
     }
   },
   buildButtonDownAnimationDirective: function(handlerInput, targetGadgets) {
@@ -118,29 +148,64 @@ module.exports = {
   },
   betInputHandler: function(handlerInput) {
     if (module.exports.supportButtons(handlerInput)) {
-      // We'll allow them to press the button again if we haven't already
+      // At this point they should have pressed a button to start the game
+      const request = handlerInput.requestEnvelope.request;
+      const attributes = handlerInput.attributesManager.getSessionAttributes();
       const inputDirective = {
         'type': 'GameEngine.StartInputHandler',
         'timeout': 30000,
         'recognizers': {
-          'button_down_recognizer': {
+          'bet_player_recognizer': {
             'type': 'match',
             'fuzzy': false,
+            'gadgetIds': [attributes.temp.buttonId],
             'anchor': 'end',
             'pattern': [{
               'action': 'down',
+              'colors': [PLAYER_BET_COLOR],
+            }],
+          },
+          'bet_banker_recognizer': {
+            'type': 'match',
+            'fuzzy': false,
+            'gadgetIds': [attributes.temp.buttonId],
+            'anchor': 'end',
+            'pattern': [{
+              'action': 'down',
+              'colors': [DEALER_BET_COLOR],
+            }],
+          },
+          'order_martini_recognizer': {
+            'type': 'match',
+            'fuzzy': false,
+            'gadgetIds': [attributes.temp.buttonId],
+            'anchor': 'end',
+            'pattern': [{
+              'action': 'down',
+              'colors': [MARTINI_BET_COLOR],
             }],
           },
         },
         'events': {
-          'button_down_event': {
-            'meets': ['button_down_recognizer'],
+          'bet_player_event': {
+            'meets': ['bet_player_recognizer'],
+            'reports': 'matches',
+            'shouldEndInputHandler': false,
+          },
+          'bet_banker_event': {
+            'meets': ['bet_banker_recognizer'],
+            'reports': 'matches',
+            'shouldEndInputHandler': false,
+          },
+          'order_martini_event': {
+            'meets': ['order_martini_recognizer'],
             'reports': 'matches',
             'shouldEndInputHandler': false,
           },
         },
       };
       handlerInput.responseBuilder.addDirective(inputDirective);
+      attributes.temp.inputHandlerRequestId = request.requestId;
     }
   },
   addBetAnimation: function(handlerInput, targetGadgets) {
@@ -150,8 +215,8 @@ module.exports = {
       // Alternate between blue (player bet), light green (martini), and red (banker bet)
       // Duration of green will vary based on how many martinis they've had!
       const martinis = (attributes.temp.martini) ? attributes.temp.martini : 0;
-      const betDuration = Math.max(200, 1000 - martinis * 200);
-      const martiniDuration = Math.max(200, martinis * 200);
+      const betDuration = Math.max(200, 1600 - martinis * 200);
+      const martiniDuration = 400 + (martinis * 200);
       const buttonDownDirective = {
         'type': 'GadgetController.SetLight',
         'version': 1,
@@ -163,13 +228,13 @@ module.exports = {
             'sequence': [
             {
               'durationMs': betDuration,
-              'color': module.exports.playerBetColor,
+              'color': PLAYER_BET_COLOR,
               'intensity': 255,
               'blend': false,
             },
             {
               'durationMs': betDuration,
-              'color': module.exports.dealerBetColor,
+              'color': DEALER_BET_COLOR,
               'intensity': 255,
               'blend': false,
             },
@@ -183,13 +248,37 @@ module.exports = {
       if (attributes.canHaveMartini) {
         buttonDownDirective.parameters.animations[0].sequence.push({
           'durationMs': martiniDuration,
-          'color': module.exports.martiniColor,
+          'color': MARTINI_BET_COLOR,
           'intensity': 255,
           'blend': false,
         });
       }
 
       handlerInput.responseBuilder.addDirective(buttonDownDirective);
+    }
+  },
+  colorButton: function(handlerInput, buttonId, buttonColor) {
+    if (module.exports.supportButtons(handlerInput)) {
+      const buttonColorDirective = {
+        'type': 'GadgetController.SetLight',
+        'version': 1,
+        'targetGadgets': [buttonId],
+        'parameters': {
+          'animations': [{
+            'repeat': 1,
+            'targetLights': ['1'],
+            'sequence': [{
+                'durationMs': 60000,
+                'color': buttonColor,
+                'blend': false,
+              }],
+          }],
+          'triggerEvent': 'none',
+          'triggerEventTimeMs': 0,
+        },
+      };
+
+      handlerInput.responseBuilder.addDirective(buttonColorDirective);
     }
   },
   turnOffButtons: function(handlerInput) {
@@ -217,98 +306,6 @@ module.exports = {
 
       handlerInput.responseBuilder
         .addDirective(turnOffButtonDirective);
-    }
-  },
-  lightPlayer: function(handlerInput, buttonId, buttonColor) {
-    if (module.exports.supportButtons(handlerInput)) {
-      const buttonIdleDirective = {
-        'type': 'GadgetController.SetLight',
-        'version': 1,
-        'targetGadgets': [buttonId],
-        'parameters': {
-          'animations': [{
-            'repeat': 1,
-            'targetLights': ['1'],
-            'sequence': [],
-          }],
-          'triggerEvent': 'none',
-          'triggerEventTimeMs': 0,
-        },
-      };
-
-      buttonIdleDirective.parameters.animations[0].sequence.push({
-        'durationMs': 60000,
-        'color': buttonColor,
-        'blend': false,
-      });
-      handlerInput.responseBuilder.addDirective(buttonIdleDirective);
-    }
-  },
-  addRollAnimation: function(handlerInput, duration, playerNumber) {
-    if (module.exports.supportButtons(handlerInput)) {
-      // Flash the buttons white while the roll is being read
-      // Then flash it green or red (based on win or loss)
-      // Finally turn on or off based on whether they are the shooter
-      const attributes = handlerInput.attributesManager.getSessionAttributes();
-      const game = attributes[attributes.currentGame];
-      let i;
-
-      const buttonDirective = {
-        'type': 'GadgetController.SetLight',
-        'version': 1,
-        'targetGadgets': [game.players[playerNumber].buttonId],
-        'parameters': {
-          'animations': [{
-            'repeat': 1,
-            'targetLights': ['1'],
-            'sequence': [],
-          }],
-          'triggerEvent': 'none',
-          'triggerEventTimeMs': 0,
-        },
-      };
-
-      // First animation - fade to white
-      buttonDirective.parameters.animations[0].sequence.push({
-        'durationMs': 1000,
-        'color': '000000',
-        'blend': false,
-      });
-      buttonDirective.parameters.animations[0].sequence.push({
-        'durationMs': duration,
-        'color': 'FFFFFF',
-        'blend': true,
-      });
-
-      // Did this player win or lose (or neither - in which case keep it white)
-      let winColor;
-      if (game.players[playerNumber].amountWon > 0) {
-        winColor = '00FE10';
-      } else if (game.players[playerNumber].amountWon < 0) {
-        winColor = 'FF0000';
-      } else {
-        winColor = 'FFFFFF';
-      }
-      for (i = 0; i < 4; i++) {
-        buttonDirective.parameters.animations[0].sequence.push({
-          'durationMs': 600,
-          'color': winColor,
-          'blend': true,
-        });
-        buttonDirective.parameters.animations[0].sequence.push({
-          'durationMs': 400,
-          'color': '000000',
-          'blend': true,
-        });
-      }
-
-      // Finally, turn this on or off based on whether you are the shooter
-      buttonDirective.parameters.animations[0].sequence.push({
-        'durationMs': 60000,
-        'color': (game.shooter === playerNumber) ? game.players[playerNumber].buttonColor : '000000',
-        'blend': false,
-      });
-      handlerInput.responseBuilder.addDirective(buttonDirective);
     }
   },
 };

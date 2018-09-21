@@ -84,6 +84,19 @@
           "samples": []
         },
         {
+          "name": "DollarAmountIntent",
+          "slots": [
+            {
+              "name": "Amount",
+              "type": "AMAZON.NUMBER"
+            }
+          ],
+          "samples": [
+            "{Amount}",
+            "{Amount} pounds"
+          ]
+        },
+        {
           "name": "BetIntent",
           "slots": [
             {

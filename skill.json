@@ -1,5 +1,5 @@
 {
-  "manifest": {
+"manifest": {
     "publishingInformation": {
       "locales": {
         "en-US": {
@@ -16,9 +16,9 @@
             "cards"
           ],
           "name": "Baccarat Table",
-          "smallIconUri": "https://s3.amazonaws.com/CAPS-SSE/echo_developer/8da0/be02fbfea51b4cf980be87fb6dba52e9/APP_ICON?versionId=9YI7GoJD4y2NxC6Hp8hBOQPY_WyL4ktI&AWSAccessKeyId=AKIAIEYXX6DHY7O4XWMA&Expires=1537591936&Signature=HHGfgSwzlT%2BVzQaKkOeLNcTCnyw%3D",
+          "smallIconUri": "https://s3.amazonaws.com/CAPS-SSE/echo_developer/ece8/b626ec77783749b0adee2b5f46901a55/APP_ICON?versionId=lvgJvmcvBW_.RuAB90aqvOC5bqWo5gpG&AWSAccessKeyId=AKIAIEYXX6DHY7O4XWMA&Expires=1537628528&Signature=IsIDqid6Rh1zAUW%2FzXu0zxvAhsU%3D",
           "description": "Play the game of Baccarat, tracking your bankroll as you play. You start with 5,000 dollars in credit and can vary your bet from 5 to 1,000 dollars. Bet on the player, banker, or a tie (optionally using an Echo Button to place your bet) - closest to 9 wins! Compare your bankroll with other players by saying \"read high scores\" to hear the leader board. Keep playing and you can move to the top! Try saying order a martini to add some sophistication to your game.\n\nHave feedback or features you'd like to see? Connect with us on Facebook at https://www.facebook.com/alexacasinogames!",
-          "largeIconUri": "https://s3.amazonaws.com/CAPS-SSE/echo_developer/b9e1/fd6c0576a2cd416dacc3f3f2082a088a/APP_ICON_LARGE?versionId=2EW3Dq.JYJ5aVE4cFccKdU3w9cFI8Roe&AWSAccessKeyId=AKIAIEYXX6DHY7O4XWMA&Expires=1537591936&Signature=6LISbfVmOOVaY0BP7Vz%2FEF7OeWU%3D"
+          "largeIconUri": "https://s3.amazonaws.com/CAPS-SSE/echo_developer/5cbc/34a899fc02694ca7a948c8d2023d3019/APP_ICON_LARGE?versionId=iDqePD1_PSc.agJ3C0JlgZLfuYfMXWN2&AWSAccessKeyId=AKIAIEYXX6DHY7O4XWMA&Expires=1537628528&Signature=koWxFcnPRvHar6e%2FkreJxaS7huo%3D"
         },
         "en-CA": {
           "summary": "Play the game of Baccarat betting on the player, banker, or a tie. Keep track of your bankroll as you play!",
@@ -34,9 +34,9 @@
             "cards"
           ],
           "name": "Baccarat Table",
-          "smallIconUri": "https://s3.amazonaws.com/CAPS-SSE/echo_developer/e5c1/d597165d0ea64a5ba21096c436794c44/APP_ICON?versionId=xE68zBXvWh9WxCsRYq0.ByUUvW6A2OJY&AWSAccessKeyId=AKIAIEYXX6DHY7O4XWMA&Expires=1537591936&Signature=mylx9HcpAPa47upOI9oFrV4hOJs%3D",
+          "smallIconUri": "https://s3.amazonaws.com/CAPS-SSE/echo_developer/ece8/b626ec77783749b0adee2b5f46901a55/APP_ICON?versionId=lvgJvmcvBW_.RuAB90aqvOC5bqWo5gpG&AWSAccessKeyId=AKIAIEYXX6DHY7O4XWMA&Expires=1537628528&Signature=IsIDqid6Rh1zAUW%2FzXu0zxvAhsU%3D",
           "description": "Play the game of Baccarat, tracking your bankroll as you play. You start with 5,000 dollars in credit and can vary your bet from 5 to 1,000 dollars. Bet on the player, banker, or a tie - closest to 9 wins! Compare your bankroll with other players by saying \"read high scores\" to hear the leader board. Keep playing and you can move to the top! Try saying order a martini to add some sophistication to your game.\n\nHave feedback or features you'd like to see? Connect with us on Facebook at https://www.facebook.com/alexacasinogames!",
-          "largeIconUri": "https://s3.amazonaws.com/CAPS-SSE/echo_developer/631b/c560b6fb805d49ba91df9b54226b4184/APP_ICON_LARGE?versionId=Lp_sfj1A1vX.SVssV2o7kMw67ASxccVz&AWSAccessKeyId=AKIAIEYXX6DHY7O4XWMA&Expires=1537591936&Signature=wcI%2F80v5WAs4Q9OU5IpVNw9bG1c%3D"
+          "largeIconUri": "https://s3.amazonaws.com/CAPS-SSE/echo_developer/5cbc/34a899fc02694ca7a948c8d2023d3019/APP_ICON_LARGE?versionId=iDqePD1_PSc.agJ3C0JlgZLfuYfMXWN2&AWSAccessKeyId=AKIAIEYXX6DHY7O4XWMA&Expires=1537628528&Signature=koWxFcnPRvHar6e%2FkreJxaS7huo%3D"
         },
         "en-IN": {
           "summary": "Play the game of Baccarat betting on the player, banker, or a tie. Keep track of your bankroll as you play!",
@@ -52,9 +52,9 @@
             "cards"
           ],
           "name": "Baccarat Table",
-          "smallIconUri": "https://s3.amazonaws.com/CAPS-SSE/echo_developer/87cd/3fc6a17e31fd46ed944e2a56ce340247/APP_ICON?versionId=YtsHEt66DwP.XwYiqyX5TjQD_E8MUqyl&AWSAccessKeyId=AKIAIEYXX6DHY7O4XWMA&Expires=1537591936&Signature=hLji1oYVheqHSoo101UiTjndKa8%3D",
+          "smallIconUri": "https://s3.amazonaws.com/CAPS-SSE/echo_developer/ece8/b626ec77783749b0adee2b5f46901a55/APP_ICON?versionId=lvgJvmcvBW_.RuAB90aqvOC5bqWo5gpG&AWSAccessKeyId=AKIAIEYXX6DHY7O4XWMA&Expires=1537628528&Signature=IsIDqid6Rh1zAUW%2FzXu0zxvAhsU%3D",
           "description": "Play the game of Baccarat, tracking your bankroll as you play. You start with 5,000 dollars in credit and can vary your bet from 5 to 1,000 dollars. Bet on the player, banker, or a tie - closest to 9 wins! Compare your bankroll with other players by saying \"read high scores\" to hear the leader board. Keep playing and you can move to the top!\n\nHave feedback or features you'd like to see? Connect with us on Facebook at https://www.facebook.com/alexacasinogames!",
-          "largeIconUri": "https://s3.amazonaws.com/CAPS-SSE/echo_developer/dee7/c7d7b05096e34dde9adac5f541f23d99/APP_ICON_LARGE?versionId=nZWJ9NXHQBNvEHES0.5kSkYilMuZetWF&AWSAccessKeyId=AKIAIEYXX6DHY7O4XWMA&Expires=1537591936&Signature=ZlgHpbVomCQREGUkb45mBrHp2f0%3D"
+          "largeIconUri": "https://s3.amazonaws.com/CAPS-SSE/echo_developer/5cbc/34a899fc02694ca7a948c8d2023d3019/APP_ICON_LARGE?versionId=iDqePD1_PSc.agJ3C0JlgZLfuYfMXWN2&AWSAccessKeyId=AKIAIEYXX6DHY7O4XWMA&Expires=1537628528&Signature=koWxFcnPRvHar6e%2FkreJxaS7huo%3D"
         },
         "en-AU": {
           "summary": "Play the game of Baccarat betting on the player, banker, or a tie. Keep track of your bankroll as you play!",
@@ -70,9 +70,9 @@
             "cards"
           ],
           "name": "Baccarat Table",
-          "smallIconUri": "https://s3.amazonaws.com/CAPS-SSE/echo_developer/91d0/2790fb1074f1402cbba82fceb053d5aa/APP_ICON?versionId=1zMoINKSQvBsai7hg9g6_t30qMUDo1VZ&AWSAccessKeyId=AKIAIEYXX6DHY7O4XWMA&Expires=1537591936&Signature=Or2B%2BcSdES0EtXGd6Gb2xMsE5o4%3D",
+          "smallIconUri": "https://s3.amazonaws.com/CAPS-SSE/echo_developer/ece8/b626ec77783749b0adee2b5f46901a55/APP_ICON?versionId=lvgJvmcvBW_.RuAB90aqvOC5bqWo5gpG&AWSAccessKeyId=AKIAIEYXX6DHY7O4XWMA&Expires=1537628528&Signature=IsIDqid6Rh1zAUW%2FzXu0zxvAhsU%3D",
           "description": "Play the game of Baccarat, tracking your bankroll as you play. You start with 5,000 dollars in credit and can vary your bet from 5 to 1,000 dollars. Bet on the player, banker, or a tie - closest to 9 wins! Compare your bankroll with other players by saying \"read high scores\" to hear the leader board. Keep playing and you can move to the top! \n\nHave feedback or features you'd like to see? Connect with us on Facebook at https://www.facebook.com/alexacasinogames!",
-          "largeIconUri": "https://s3.amazonaws.com/CAPS-SSE/echo_developer/2a5d/2e05d1f4c730488eba48315b4d20db77/APP_ICON_LARGE?versionId=ZIkqdOMEihjFCtwLcZ_kIzW3MtFeIL1u&AWSAccessKeyId=AKIAIEYXX6DHY7O4XWMA&Expires=1537591936&Signature=Bur%2B%2FFearkH2Cx1F%2BRr%2B9tT0uh4%3D"
+          "largeIconUri": "https://s3.amazonaws.com/CAPS-SSE/echo_developer/5cbc/34a899fc02694ca7a948c8d2023d3019/APP_ICON_LARGE?versionId=iDqePD1_PSc.agJ3C0JlgZLfuYfMXWN2&AWSAccessKeyId=AKIAIEYXX6DHY7O4XWMA&Expires=1537628528&Signature=koWxFcnPRvHar6e%2FkreJxaS7huo%3D"
         },
         "en-GB": {
           "summary": "Play the game of Baccarat betting on the player, banker, or a tie. Keep track of your bankroll as you play!",
@@ -88,9 +88,9 @@
             "cards"
           ],
           "name": "Baccarat Table",
-          "smallIconUri": "https://s3.amazonaws.com/CAPS-SSE/echo_developer/dc88/2000a647fcad4d56ba2ba39b1a2e3070/APP_ICON?versionId=73KEUtUU9O5mfUlZP4hGjLGFv.Ygszws&AWSAccessKeyId=AKIAIEYXX6DHY7O4XWMA&Expires=1537591936&Signature=2rXK8tO6eFGV4TUPr7DvVgPUrsA%3D",
+          "smallIconUri": "https://s3.amazonaws.com/CAPS-SSE/echo_developer/ece8/b626ec77783749b0adee2b5f46901a55/APP_ICON?versionId=lvgJvmcvBW_.RuAB90aqvOC5bqWo5gpG&AWSAccessKeyId=AKIAIEYXX6DHY7O4XWMA&Expires=1537628528&Signature=IsIDqid6Rh1zAUW%2FzXu0zxvAhsU%3D",
           "description": "Play the game of Baccarat, tracking your bankroll as you play. You start with 5,000 pounds in credit and can vary your bet from 5 to 1,000 pounds. Bet on the player, banker, or a tie (optionally using an Echo Button to place your bet) - closest to 9 wins! Compare your bankroll with other players by saying \"read high scores\" to hear the leader board. Keep playing and you can move to the top! \n\nHave feedback or features you'd like to see? Connect with us on Facebook at https://www.facebook.com/alexacasinogames!",
-          "largeIconUri": "https://s3.amazonaws.com/CAPS-SSE/echo_developer/1d5e/2f94c1b008ff4a86bc84baddc4a99a63/APP_ICON_LARGE?versionId=gJJqQJ2xDgHViLJjrnlbVSVfyAR4QV7d&AWSAccessKeyId=AKIAIEYXX6DHY7O4XWMA&Expires=1537591936&Signature=OhnH5RuyUnTzR6eZIfgUskSeTE4%3D"
+          "largeIconUri": "https://s3.amazonaws.com/CAPS-SSE/echo_developer/5cbc/34a899fc02694ca7a948c8d2023d3019/APP_ICON_LARGE?versionId=iDqePD1_PSc.agJ3C0JlgZLfuYfMXWN2&AWSAccessKeyId=AKIAIEYXX6DHY7O4XWMA&Expires=1537628528&Signature=koWxFcnPRvHar6e%2FkreJxaS7huo%3D"
         }
       },
       "isAvailableWorldwide": true,

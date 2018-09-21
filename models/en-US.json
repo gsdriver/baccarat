@@ -74,7 +74,9 @@
             "order a martini",
             "order a drink",
             "get me a martini",
-            "can i have a martini"
+            "give me a martini",
+            "can i have a martini",
+            "can i have another"
           ]
         },
         {
@@ -109,6 +111,19 @@
         {
           "name": "AMAZON.NoIntent",
           "samples": []
+        },
+        {
+          "name": "DollarAmountIntent",
+          "slots": [
+            {
+              "name": "Amount",
+              "type": "AMAZON.NUMBER"
+            }
+          ],
+          "samples": [
+            "{Amount}",
+            "{Amount} dollars"
+          ]
         },
         {
           "name": "BetIntent",

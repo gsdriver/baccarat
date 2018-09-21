@@ -15,7 +15,39 @@
         }
       },
       "in_skill_products": [],
-      "resources": {}
+      "resources": {
+        "manifest": {
+          "eTag": "820d31e17571f371e1840fae8e2175fc"
+        },
+        "interactionModel": {
+          "en-AU": {
+            "eTag": "ab166f36f5d7a9d350897c4be7f1da20"
+          },
+          "en-GB": {
+            "eTag": "891b139ea0d98cdd61c250cb057456af"
+          },
+          "en-CA": {
+            "eTag": "9bf69fac98da765e2c154dde115ecc9d"
+          },
+          "en-IN": {
+            "eTag": "ab166f36f5d7a9d350897c4be7f1da20"
+          },
+          "en-US": {
+            "eTag": "558741eb5cff1698a3d59138d5574b7a"
+          }
+        },
+        "lambda": [
+          {
+            "arn": "arn:aws:lambda:us-east-1:129065607926:function:BaccaratTemp",
+            "functionName": "arn:aws:lambda:us-east-1:129065607926:function:BaccaratTemp",
+            "awsRegion": "us-east-1",
+            "alexaUsage": [
+              "custom/default"
+            ],
+            "revisionId": "fc9b31cc-3f40-4d96-871e-91cb4abaed29"
+          }
+        ]
+      }
     }
   }
 }

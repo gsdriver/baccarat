@@ -11,12 +11,11 @@ module.exports = {
     const request = handlerInput.requestEnvelope.request;
     const attributes = handlerInput.attributesManager.getSessionAttributes();
 
-    // Button press counts as spin if it's a new button
-    // or one that's been pressed before
-    if ((request.type === 'GameEngine.InputHandlerEvent') && attributes.temp.newGame) {
-      const buttonId = buttons.getPressedButton(request, attributes);
-      if (!attributes.temp.buttonId || (buttonId == attributes.temp.buttonId)) {
-        attributes.temp.buttonId = buttonId;
+    // Ignore if they already pressed a button
+    if ((request.type === 'GameEngine.InputHandlerEvent') && attributes.temp.newGame
+      && !attributes.temp.buttonId) {
+      attributes.temp.buttonId = buttons.getPressedButton(request);
+      if (attributes.temp.buttonId) {
         return true;
       }
     }

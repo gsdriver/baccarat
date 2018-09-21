@@ -5,10 +5,16 @@
 'use strict';
 
 const seedrandom = require('seedrandom');
+const buttons = require('../buttons');
 
 module.exports = {
   canHandle: function(handlerInput) {
     const request = handlerInput.requestEnvelope.request;
+
+    if (request.type === 'GameEngine.InputHandlerEvent') {
+      // Did they press while on the order martini color?
+      return (buttons.getButtonIntent(request) === 'order_martini_event');
+    }
 
     return ((request.type === 'IntentRequest') && (request.intent.name === 'OrderMartiniIntent'));
   },
@@ -49,6 +55,12 @@ module.exports = {
       ? res.strings.MARTINI_DRINK_CALM
       : res.strings.MARTINI_DRINK) + reprompt;
     attributes.temp.coffee = 0;
+
+    // Set button animation and input
+    if (attributes.temp.buttonId) {
+      buttons.betInputHandler(handlerInput);
+      buttons.addBetAnimation(handlerInput, [attributes.temp.buttonId]);
+    }
 
     return handlerInput.responseBuilder
       .speak(speech)
