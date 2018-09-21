@@ -40,7 +40,7 @@ module.exports = {
       // We'll allow them to press the button again if we haven't already
       const inputDirective = {
         'type': 'GameEngine.StartInputHandler',
-        'timeout': 60000,
+        'timeout': 30000,
         'recognizers': {
           'button_down_recognizer': {
             'type': 'match',
@@ -86,7 +86,64 @@ module.exports = {
       handlerInput.responseBuilder.addDirective(buttonDownDirective);
     }
   },
-  addLaunchAnimation: function(handlerInput, targetGadgets) {
+  addLaunchAnimation: function(handlerInput) {
+    if (module.exports.supportButtons(handlerInput)) {
+      // Flash the buttons white a few times
+      // Then place them all in a steady white state
+      const buttonIdleDirective = {
+        'type': 'GadgetController.SetLight',
+        'version': 1,
+        'targetGadgets': [],
+        'parameters': {
+          'animations': [{
+            'repeat': 100,
+            'targetLights': ['1'],
+            'sequence': [{
+              'durationMs': 400,
+              'color': 'FFFFFF',
+              'blend': true,
+            },
+            {
+              'durationMs': 300,
+              'color': '000000',
+              'blend': true,
+            }],
+          }],
+          'triggerEvent': 'none',
+          'triggerEventTimeMs': 0,
+        },
+      };
+      handlerInput.responseBuilder.addDirective(buttonIdleDirective);
+    }
+  },
+  betInputHandler: function(handlerInput) {
+    if (module.exports.supportButtons(handlerInput)) {
+      // We'll allow them to press the button again if we haven't already
+      const inputDirective = {
+        'type': 'GameEngine.StartInputHandler',
+        'timeout': 30000,
+        'recognizers': {
+          'button_down_recognizer': {
+            'type': 'match',
+            'fuzzy': false,
+            'anchor': 'end',
+            'pattern': [{
+              'action': 'down',
+            }],
+          },
+        },
+        'events': {
+          'button_down_event': {
+            'meets': ['button_down_recognizer'],
+            'reports': 'matches',
+            'shouldEndInputHandler': false,
+          },
+        },
+      };
+      handlerInput.responseBuilder.addDirective(inputDirective);
+    }
+  },
+  addBetAnimation: function(handlerInput, targetGadgets) {
     if (module.exports.supportButtons(handlerInput)) {
       const attributes = handlerInput.attributesManager.getSessionAttributes();
 
@@ -116,18 +173,22 @@ module.exports = {
               'intensity': 255,
               'blend': false,
             },
-            {
-              'durationMs': martiniDuration,
-              'color': module.exports.martiniColor,
-              'intensity': 255,
-              'blend': false,
-            },
             ],
           }],
           'triggerEvent': 'none',
           'triggerEventTimeMs': 0,
         },
       };
+
+      if (attributes.canHaveMartini) {
+        buttonDownDirective.parameters.animations[0].sequence.push({
+          'durationMs': martiniDuration,
+          'color': module.exports.martiniColor,
+          'intensity': 255,
+          'blend': false,
+        });
+      }
+
       handlerInput.responseBuilder.addDirective(buttonDownDirective);
     }
   },

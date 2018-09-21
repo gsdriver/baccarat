@@ -32,6 +32,7 @@ module.exports = {
         .getResponse();
     }
 
+    attributes.temp.newGame = undefined;
     let speech = '';
     const game = attributes[attributes.currentGame];
     if ((game.bet !== bet.amount) || (game.betOn !== bet.betOn)) {

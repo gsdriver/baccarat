@@ -31,6 +31,7 @@ const common = {
   'HIGHSCORE_REPROMPT': 'What else can I help you with?',
   // From Launch.js
   'LAUNCH_WELCOME': 'Welcome to Baccarat Table. ',
+  'LAUNCH_WELCOME_BUTTON': 'If you have an Echo Button, press it to start playing or say bet to play.',
   'LAUNCH_REPROMPT': 'Say bet to play.',
   'LAUNCH_SOBER': 'The break did you good <break time=\'200ms\'/> your head is cleared up. ',
   // From Martini.js
@@ -38,6 +39,8 @@ const common = {
   'MARTINI_DRINK_CALM': 'Ah, that calms my nerves. ',
   'MARTINI_REPROMPT': 'What else can I help you with?',
   'MARTINI': 'martini',
+  // From StartGame.js
+  'STARTGAME_REPROMPT': 'Say bet to play.',
   // From utils.js
   'MORE_THAN_PLAYERS': 'over {0}',
   'GENERIC_REPROMPT': 'What else can I help with?',
@@ -93,11 +96,15 @@ const pound = {
 
 // Help is different thanks to martini laws
 const martini = {
+  // From StartGame.js
+  'STARTGAME_START': 'Thanks <break time=\'300ms\'/> you can use your Echo Button to place a bet. Press it when it\'s blue to bet on the player or orange to bet on the dealer. <break time=\'300ms\'/> Or say bet on player or bet on dealer. <break time=\'300ms\'/> Catch the button when it\'s green to order a martini. ',
   // From Help.js
   'HELP_CARD_TEXT': 'You can bet between ${0} and ${1} per round by saying BET and the amount you want to bet. You can also specify whether you want to bet on the player, banker, or tie (for example - BET $20 ON THE PLAYER). If you bet on the player hand and win it pays even money, betting on the banker hand results in a 5% commission, and betting on a tie hand pays {4} to 1.\nPoint values for cards are 0 for tens and face cards, 1 for aces, and the point value for 2-9. To get the total for a hand, you add the values of the cards in the hand and take the right digit to get a value between 0 and 9. For example, a 5 and a 7 would be a total of 2.\nBoth players are dealt two cards and the dealer automatically plays both hands. If either hand totals 8 or 9, the round is over immediately. Otherwise, if the player has a total of 0-5, they draw otherwise they stay.\nThe banker\'s action is a little more complex. If the player stood, the banker hits on a total of 0-5, and stands on 6 or 7. Otherwise:\n  - Total of 0-2, the banker draws\n  - Total of 3, banker draws unless the player\'s third card is 8\n  - Total of 4, banker draws if the player\'s third card is 2-7\n  - Total of 5, banker draws if the player\'s third card was 4-7\n  - Total of 6, banker draws if the player\'s third card was 6-7\n  - Total of 7, banker stands\nSay READ HIGH SCORES to hear the leader board.\nYou can also ORDER A MARTINI to get into the spirit of the game, or ORDER A COFFEE if you\'ve had too much.\nGood luck!',
 };
 
 const noMartini = {
+  // From StartGame.js
+  'STARTGAME_START': 'Thanks <break time=\'300ms\'/> you can use your Echo Button to place a bet. Press it when it\'s blue to bet on the player or orange to bet on the dealer. <break time=\'300ms\'/> Or say bet on player or bet on dealer. ',
   // From Help.js
   'HELP_CARD_TEXT': 'You can bet between ${0} and ${1} per round by saying BET and the amount you want to bet. You can also specify whether you want to bet on the player, banker, or tie (for example - BET $20 ON THE PLAYER). If you bet on the player hand and win it pays even money, betting on the banker hand results in a 5% commission, and betting on a tie hand pays {4} to 1.\nPoint values for cards are 0 for tens and face cards, 1 for aces, and the point value for 2-9. To get the total for a hand, you add the values of the cards in the hand and take the right digit to get a value between 0 and 9. For example, a 5 and a 7 would be a total of 2.\nBoth players are dealt two cards and the dealer automatically plays both hands. If either hand totals 8 or 9, the round is over immediately. Otherwise, if the player has a total of 0-5, they draw otherwise they stay.\nThe banker\'s action is a little more complex. If the player stood, the banker hits on a total of 0-5, and stands on 6 or 7. Otherwise:\n  - Total of 0-2, the banker draws\n  - Total of 3, banker draws unless the player\'s third card is 8\n  - Total of 4, banker draws if the player\'s third card is 2-7\n  - Total of 5, banker draws if the player\'s third card was 4-7\n  - Total of 6, banker draws if the player\'s third card was 6-7\n  - Total of 7, banker stands\nSay READ HIGH SCORES to hear the leader board.\nGood luck!',
 };

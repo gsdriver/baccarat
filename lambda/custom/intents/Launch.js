@@ -4,6 +4,8 @@
 
 'use strict';
 
+const buttons = require('../buttons');
+
 module.exports = {
   canHandle: function(handlerInput) {
     return handlerInput.requestEnvelope.session.new ||
@@ -27,8 +29,10 @@ module.exports = {
       speech += res.strings.LAUNCH_SOBER;
       attributes.wasDrunk = undefined;
     }
+    attributes.temp.newGame = true;
 
-    const reprompt = res.strings.LAUNCH_REPROMPT;
+    const reprompt = (buttons.supportButtons(handlerInput))
+      ? res.strings.LAUNCH_WELCOME_BUTTON : res.strings.LAUNCH_REPROMPT;
     speech += reprompt;
     return handlerInput.responseBuilder
       .speak(speech)

@@ -118,6 +118,68 @@ function BuildEvent(argv)
    },
   };
 
+  var buttonEvent = {
+    "session": {
+      "sessionId": "SessionId.c88ec34d-28b0-46f6-a4c7-120d8fba8fa7",
+      "application": {
+        "applicationId": "amzn1.ask.skill.5e88f594-31a0-4d86-9a67-1aee5d717c19"
+      },
+      "attributes": {},
+      "user": {
+        "userId": "not-amazon",
+      },
+      "new": false
+    },
+    "request": {
+      "type": "GameEngine.InputHandlerEvent",
+      "requestId": "amzn1.echo-api.request.f25e7902-62bc-4661-90d9-aaac30c1a937",
+      "timestamp": "2018-08-02T01:05:33Z",
+      "locale": "en-US",
+      "originatingRequestId": "amzn1.echo-api.request.0b7a4f65-115d-427c-9aa0-5c78c57c740f",
+      "events": [
+        {
+          "name": "button_down_event",
+          "inputEvents": [
+            {
+              "gadgetId": "1",
+              "timestamp": "2018-08-02T01:05:29.371Z",
+              "color": "000000",
+              "feature": "press",
+              "action": "down"
+            }
+          ]
+        }
+      ]
+    },
+    "version": "1.0",
+     "context": {
+       "AudioPlayer": {
+         "playerActivity": "IDLE"
+       },
+       "Display": {},
+       "System": {
+         "application": {
+           "applicationId": "amzn1.ask.skill.5e88f594-31a0-4d86-9a67-1aee5d717c19"
+         },
+         "user": {
+           "userId": "not-amazon",
+         },
+         "device": {
+           "deviceId": "not-amazon",
+           "supportedInterfaces": {
+             "AudioPlayer": {},
+             "Display": {
+               "templateVersion": "1.0",
+               "markupVersion": "1.0"
+             }
+           }
+         },
+         "apiEndpoint": "https://api.amazonalexa.com",
+         "apiAccessToken": "",
+       }
+     },
+  };
+
   // If there is an attributes.txt file, read the attributes from there
   const fs = require('fs');
   if (fs.existsSync(attributeFile)) {
@@ -125,6 +187,7 @@ function BuildEvent(argv)
     if (data) {
       lambda.session.attributes = JSON.parse(data);
       openEvent.session.attributes = JSON.parse(data);
+      buttonEvent.session.attributes = JSON.parse(data);
     }
   }
 
@@ -161,6 +224,8 @@ function BuildEvent(argv)
     lambda.request.intent = reset;
   } else if (argv[2] == 'repeat') {
     lambda.request.intent = repeat;
+  } else if (argv[2] == 'button') {
+    return buttonEvent;
   } else if (argv[2] == 'martini') {
     lambda.request.intent = martini;
   } else if (argv[2] == 'coffee') {

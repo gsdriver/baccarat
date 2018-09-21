@@ -7,6 +7,7 @@
 const Alexa = require('ask-sdk');
 const CanFulfill = require('./intents/CanFulfill');
 const Launch = require('./intents/Launch');
+const StartGame = require('./intents/StartGame');
 const Bet = require('./intents/Bet');
 const Exit = require('./intents/Exit');
 const Help = require('./intents/Help');
@@ -47,6 +48,7 @@ const requestInterceptor = {
             attributes.temp.newSession = true;
             attributes.sessions = (attributes.sessions + 1) || 1;
             attributes.bot = sessionAttributes.bot;
+            attributes.canHaveMartini = (event.request.locale === 'en-US');
             attributesManager.setSessionAttributes(attributes);
             resolve();
           })
@@ -67,7 +69,7 @@ const saveResponseInterceptor = {
       const attributes = handlerInput.attributesManager.getSessionAttributes();
 
       if (response) {
-        if (attributes.temp.newSession) {
+        if (attributes.temp && attributes.temp.newSession) {
           // Set up the buttons to all flash, welcoming the user to press a button
           buttons.addLaunchAnimation(handlerInput);
           buttons.buildButtonDownAnimationDirective(handlerInput, []);
@@ -78,6 +80,9 @@ const saveResponseInterceptor = {
           if (response.shouldEndSession) {
             // We are meant to end the session
             SessionEnd.handle(handlerInput);
+          }
+          if (!process.env.NOLOG) {
+            console.log(JSON.stringify(response));
           }
           resolve();
         });
@@ -128,6 +133,7 @@ function runGame(event, context, callback) {
   });
   const skillFunction = skillBuilder.addRequestHandlers(
       Launch,
+      StartGame,
       Martini,
       Coffee,
       Bet,
