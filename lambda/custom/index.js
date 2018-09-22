@@ -50,9 +50,10 @@ const requestInterceptor = {
             attributes.bot = sessionAttributes.bot;
 
             // Clear the bet and establish if we can have martinis
+            const martinis = ['en-US', 'en-CA', 'en-GB'];
             attributes[attributes.currentGame].bet = undefined;
             attributes[attributes.currentGame].betOn = undefined;
-            attributes.canHaveMartini = (event.request.locale === 'en-US');
+            attributes.canHaveMartini = (martinis.indexOf(event.request.locale) > -1);
             attributesManager.setSessionAttributes(attributes);
             resolve();
           })
@@ -84,6 +85,20 @@ const saveResponseInterceptor = {
           if (response.shouldEndSession) {
             // We are meant to end the session
             SessionEnd.handle(handlerInput);
+          }
+          // Are they jittery on coffee?
+          if (attributes.temp && (attributes.temp.coffee > 0)) {
+            let text;
+            const rate = 100 + (20 * attributes.temp.coffee);
+            if (response.outputSpeech && response.outputSpeech.ssml) {
+              text = response.outputSpeech.ssml.replace('<speak>', '<speak><prosody rate="' + rate + '%">');
+              response.outputSpeech.ssml = text.replace('</speak>', '</prosody></speak>');
+            }
+            if (response.reprompt && response.reprompt.outputSpeech
+              && response.reprompt.outputSpeech.ssml) {
+              text = response.reprompt.outputSpeech.ssml.replace('<speak>', '<speak><prosody rate="' + rate + '%">');
+              response.reprompt.outputSpeech.ssml = text.replace('</speak>', '</prosody></speak>');
+            }
           }
           if (!process.env.NOLOG) {
             console.log(JSON.stringify(response));

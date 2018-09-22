@@ -64,6 +64,30 @@
           "samples": []
         },
         {
+          "name": "OrderMartiniIntent",
+          "slots": [],
+          "samples": [
+            "order a martini",
+            "order a drink",
+            "get me a martini",
+            "give me a martini",
+            "can i have a martini",
+            "can i have another"
+          ]
+        },
+        {
+          "name": "OrderCoffeeIntent",
+          "slots": [],
+          "samples": [
+            "order a coffee",
+            "order some coffee",
+            "get me some coffee",
+            "get me a coffee",
+            "can i have some coffee",
+            "can i have a coffee"
+          ]
+        },
+        {
           "name": "HighScoreIntent",
           "samples": [
             "read high scores",

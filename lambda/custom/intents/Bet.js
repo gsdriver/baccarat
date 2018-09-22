@@ -85,12 +85,14 @@ module.exports = {
     let dealerTotal = utils.handTotal(game.dealer);
 
     // Let them know what they got
+    speech += '<audio src=\"https://s3-us-west-2.amazonaws.com/alexasoundclips/dealcard.mp3\"/> ';
     speech += res.getDrunkOption('BET_PLAYER_CARDS')
         .replace('{0}', utils.sayCard(handlerInput, game.player[0]))
         .replace('{1}', utils.sayCard(handlerInput, game.player[1]))
         .replace('{2}', playerTotal)
         .replace('{3}', (playerTotal + 2) % 10)
         .replace('{4}', utils.sayCard(handlerInput, game.dealer[0]));
+    speech += '<audio src=\"https://s3-us-west-2.amazonaws.com/alexasoundclips/dealcard.mp3\"/> ';
     speech += res.getDrunkOption('BET_DEALER_CARDS')
         .replace('{0}', utils.sayCard(handlerInput, game.dealer[0]))
         .replace('{1}', utils.sayCard(handlerInput, game.dealer[1]))
@@ -104,6 +106,7 @@ module.exports = {
         game.player.push(game.deck.shift());
         playerCard = game.player[2].rank;
         playerTotal = utils.handTotal(game.player);
+        speech += '<break time=\'400ms\'/> <audio src=\"https://s3-us-west-2.amazonaws.com/alexasoundclips/dealcard.mp3\"/> ';
         speech += res.getDrunkOption('BET_NEXT_PLAYERCARD')
             .replace('{0}', utils.sayCard(handlerInput, game.player[2]))
             .replace('{1}', playerTotal)
@@ -145,6 +148,7 @@ module.exports = {
       if (dealerDraw) {
         game.dealer.push(game.deck.shift());
         dealerTotal = utils.handTotal(game.dealer);
+        speech += '<break time=\'400ms\'/> <audio src=\"https://s3-us-west-2.amazonaws.com/alexasoundclips/dealcard.mp3\"/> ';
         speech += res.getDrunkOption('BET_NEXT_DEALERCARD')
             .replace('{0}', utils.sayCard(handlerInput, game.dealer[2]))
             .replace('{1}', dealerTotal);

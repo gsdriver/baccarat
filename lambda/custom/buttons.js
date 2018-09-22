@@ -4,9 +4,9 @@
 
 'use strict';
 
-const PLAYER_BET_COLOR = '00008B'; // Blue
+const PLAYER_BET_COLOR = '0000FF'; // Dark Blue
 const MARTINI_BET_COLOR = '90EE90'; // Green
-const DEALER_BET_COLOR = 'FFA500'; // Red
+const DEALER_BET_COLOR = 'FF6600'; // Orange
 
 module.exports = {
   supportButtons: function(handlerInput) {
@@ -92,60 +92,6 @@ module.exports = {
       attributes.temp.inputHandlerRequestId = request.requestId;
     }
   },
-  buildButtonDownAnimationDirective: function(handlerInput, targetGadgets) {
-    if (module.exports.supportButtons(handlerInput)) {
-      const buttonDownDirective = {
-        'type': 'GadgetController.SetLight',
-        'version': 1,
-        'targetGadgets': targetGadgets,
-        'parameters': {
-          'animations': [{
-            'repeat': 1,
-            'targetLights': ['1'],
-            'sequence': [{
-              'durationMs': 500,
-              'color': 'FFFF00',
-              'intensity': 255,
-              'blend': false,
-            }],
-          }],
-          'triggerEvent': 'buttonDown',
-          'triggerEventTimeMs': 0,
-        },
-      };
-      handlerInput.responseBuilder.addDirective(buttonDownDirective);
-    }
-  },
-  addLaunchAnimation: function(handlerInput) {
-    if (module.exports.supportButtons(handlerInput)) {
-      // Flash the buttons white a few times
-      // Then place them all in a steady white state
-      const buttonIdleDirective = {
-        'type': 'GadgetController.SetLight',
-        'version': 1,
-        'targetGadgets': [],
-        'parameters': {
-          'animations': [{
-            'repeat': 100,
-            'targetLights': ['1'],
-            'sequence': [{
-              'durationMs': 400,
-              'color': 'FFFFFF',
-              'blend': true,
-            },
-            {
-              'durationMs': 300,
-              'color': '000000',
-              'blend': true,
-            }],
-          }],
-          'triggerEvent': 'none',
-          'triggerEventTimeMs': 0,
-        },
-      };
-      handlerInput.responseBuilder.addDirective(buttonIdleDirective);
-    }
-  },
   betInputHandler: function(handlerInput) {
     if (module.exports.supportButtons(handlerInput)) {
       // At this point they should have pressed a button to start the game
@@ -208,6 +154,60 @@ module.exports = {
       attributes.temp.inputHandlerRequestId = request.requestId;
     }
   },
+  buildButtonDownAnimationDirective: function(handlerInput, targetGadgets) {
+    if (module.exports.supportButtons(handlerInput)) {
+      const buttonDownDirective = {
+        'type': 'GadgetController.SetLight',
+        'version': 1,
+        'targetGadgets': targetGadgets,
+        'parameters': {
+          'animations': [{
+            'repeat': 1,
+            'targetLights': ['1'],
+            'sequence': [{
+              'durationMs': 500,
+              'color': 'FFFF00',
+              'intensity': 255,
+              'blend': false,
+            }],
+          }],
+          'triggerEvent': 'buttonDown',
+          'triggerEventTimeMs': 0,
+        },
+      };
+      handlerInput.responseBuilder.addDirective(buttonDownDirective);
+    }
+  },
+  addLaunchAnimation: function(handlerInput) {
+    if (module.exports.supportButtons(handlerInput)) {
+      // Flash the buttons white a few times
+      // Then place them all in a steady white state
+      const buttonIdleDirective = {
+        'type': 'GadgetController.SetLight',
+        'version': 1,
+        'targetGadgets': [],
+        'parameters': {
+          'animations': [{
+            'repeat': 100,
+            'targetLights': ['1'],
+            'sequence': [{
+              'durationMs': 400,
+              'color': 'FFFFFF',
+              'blend': true,
+            },
+            {
+              'durationMs': 300,
+              'color': '000000',
+              'blend': true,
+            }],
+          }],
+          'triggerEvent': 'none',
+          'triggerEventTimeMs': 0,
+        },
+      };
+      handlerInput.responseBuilder.addDirective(buttonIdleDirective);
+    }
+  },
   addBetAnimation: function(handlerInput, targetGadgets) {
     if (module.exports.supportButtons(handlerInput)) {
       const attributes = handlerInput.attributesManager.getSessionAttributes();
@@ -223,7 +223,7 @@ module.exports = {
         'targetGadgets': targetGadgets,
         'parameters': {
           'animations': [{
-            'repeat': 10,
+            'repeat': 30,
             'targetLights': ['1'],
             'sequence': [
             {

@@ -28,7 +28,8 @@ module.exports = {
     if (reprompt.indexOf(res.getString('COFFEE')) > -1) {
       reprompt = res.getString('COFFEE_REPROMPT');
     }
-    const speech = (attributes.temp.martini
+    let speech = '<audio src="https://s3-us-west-2.amazonaws.com/alexasoundclips/baccarat/coffee.mp3"/> ';
+    speech += (attributes.temp.martini
       ? res.getString('COFFEE_DRINK_SOBER')
       : res.getString('COFFEE_DRINK')) + reprompt;
     attributes.temp.martini = 0;

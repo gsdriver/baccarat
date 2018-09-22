@@ -8,7 +8,7 @@
           "apis": {
             "custom": {
               "endpoint": {
-                "uri": "arn:aws:lambda:us-east-1:129065607926:function:BaccaratTemp"
+                "uri": "arn:aws:lambda:us-east-1:129065607926:function:Baccarat2"
               }
             }
           }
@@ -17,14 +17,14 @@
       "in_skill_products": [],
       "resources": {
         "manifest": {
-          "eTag": "820d31e17571f371e1840fae8e2175fc"
+          "eTag": "bde3b23ef4a0771524d179d55830acbb"
         },
         "interactionModel": {
           "en-AU": {
             "eTag": "ab166f36f5d7a9d350897c4be7f1da20"
           },
           "en-GB": {
-            "eTag": "891b139ea0d98cdd61c250cb057456af"
+            "eTag": "2ff7b07bb72b963fdc338191d9ec8f3f"
           },
           "en-CA": {
             "eTag": "9bf69fac98da765e2c154dde115ecc9d"
@@ -38,13 +38,13 @@
         },
         "lambda": [
           {
-            "arn": "arn:aws:lambda:us-east-1:129065607926:function:BaccaratTemp",
-            "functionName": "arn:aws:lambda:us-east-1:129065607926:function:BaccaratTemp",
+            "arn": "arn:aws:lambda:us-east-1:129065607926:function:Baccarat2",
+            "functionName": "arn:aws:lambda:us-east-1:129065607926:function:Baccarat2",
             "awsRegion": "us-east-1",
             "alexaUsage": [
               "custom/default"
             ],
-            "revisionId": "aa52625d-0e6d-4de3-b023-49c9724ad90a"
+            "revisionId": "3f4cf5b2-3b45-4754-aee7-2be5dfe9cfa6"
           }
         ]
       }
