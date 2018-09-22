@@ -11,9 +11,8 @@ module.exports = {
     return ((request.type === 'IntentRequest') && (request.intent.name === 'OrderCoffeeIntent'));
   },
   handle: function(handlerInput) {
-    const event = handlerInput.requestEnvelope;
     const attributes = handlerInput.attributesManager.getSessionAttributes();
-    const res = require('../resources')(event.request.locale);
+    const res = require('../resources')(handlerInput);
 
     if (!attributes.temp.martini) {
       attributes.temp.coffee = (attributes.temp.coffee + 1) || 1;
@@ -25,13 +24,13 @@ module.exports = {
 
     let reprompt = (attributes.temp.reprompt
       ? attributes.temp.reprompt
-      : res.strings.COFFEE_REPROMPT);
-    if (reprompt.indexOf(res.strings.COFFEE) > -1) {
-      reprompt = res.strings.COFFEE_REPROMPT;
+      : res.getString('COFFEE_REPROMPT'));
+    if (reprompt.indexOf(res.getString('COFFEE')) > -1) {
+      reprompt = res.getString('COFFEE_REPROMPT');
     }
     const speech = (attributes.temp.martini
-      ? res.strings.COFFEE_DRINK_SOBER
-      : res.strings.COFFEE_DRINK) + reprompt;
+      ? res.getString('COFFEE_DRINK_SOBER')
+      : res.getString('COFFEE_DRINK')) + reprompt;
     attributes.temp.martini = 0;
 
     return handlerInput.responseBuilder

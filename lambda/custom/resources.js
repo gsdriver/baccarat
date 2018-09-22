@@ -1,5 +1,7 @@
 // Localized resources
 
+const seedrandom = require('seedrandom');
+
 // Shared between all languages
 const common = {
   // From index.js
@@ -47,7 +49,7 @@ const common = {
   'GENERIC_REPROMPT': 'What else can I help with?',
   'LEADER_NO_SCORES': 'Sorry, I\'m unable to read the current leader board',
   'LEADER_TOP_BANKROLLS': 'The top {0} bankrolls are ',
-  'CARD_RANKS': 'ace|two|three|four|five|six|seven|eight|nine|ten|jack|queen|king',
+  'CARD_RANKS': 'ace;two;three;four;five;six;seven;eight;nine;ten;jack;queen;king',
   'CARD_SUITS': '{"C":"clubs","D":"diamonds","H":"hearts","S":"spades"}',
   'CARD_NAME': '{0} of {1}',
   'READ_OLD_PLAYER_CARDS': 'You had {0} for a total of {1}. ',
@@ -125,7 +127,8 @@ const resources = {
   },
 };
 
-const utils = (locale) => {
+const utils = (handlerInput) => {
+  const locale = handlerInput.requestEnvelope.request.locale;
   let translation;
   if (resources[locale]) {
     translation = resources[locale].translation;
@@ -134,8 +137,52 @@ const utils = (locale) => {
   }
 
   return {
-    strings: translation,
+    getString: function(res) {
+      return pickRandomOption(handlerInput, translation[res]);
+    },
+    getDrunkOption: function(res) {
+      const event = handlerInput.requestEnvelope;
+      const attributes = handlerInput.attributesManager.getSessionAttributes();
+
+      // How many martinis have you had?
+      const options = translation[res].split('|');
+      const martini = attributes.temp.martini;
+      let drunkLevel;
+
+      if (process.env.NODRUNKTEXT || !martini) {
+        // Spoil sport
+        drunkLevel = 0;
+      } else {
+        // OK, you're drunk
+        attributes.stringCount = (attributes.stringCount + 1) || 1;
+        const randomValue = seedrandom(event.session.user.userId + attributes.stringCount)();
+        let j = Math.floor(randomValue * (martini + 1));
+        if (j == (martini + 1)) {
+          j--;
+        }
+
+        // OK, there's a 2 / (martini + 1) chance you'll get each level
+        // of drunk text, until you hit the last option - the more drinks
+        // you've had, the more likely you'll get drunk text
+        drunkLevel = Math.floor(j / 2);
+        if (drunkLevel > (options.length - 1)) {
+          drunkLevel = options.length - 1;
+        }
+      }
+
+      return options[drunkLevel];
+    },
   };
 };
 
 module.exports = utils;
+
+function pickRandomOption(handlerInput, res) {
+  const event = handlerInput.requestEnvelope;
+  const attributes = handlerInput.attributesManager.getSessionAttributes();
+
+  const options = res.split('|');
+  attributes.stringCount = (attributes.stringCount + 1) || 1;
+  const seed = event.session.user.userId + attributes.temp.stringCount;
+  return options[Math.floor(seedrandom(seed)() * options.length)];
+}

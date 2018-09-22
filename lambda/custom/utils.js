@@ -38,7 +38,7 @@ module.exports = {
     const event = handlerInput.requestEnvelope;
     const attributes = handlerInput.attributesManager.getSessionAttributes();
     const game = attributes[attributes.currentGame];
-    const res = require('./resources')(event.request.locale);
+    const res = require('./resources')(handlerInput);
     let leaderURL = process.env.SERVICEURL + 'baccarat/leaders';
     let speech = '';
     const params = {};
@@ -60,25 +60,25 @@ module.exports = {
       }, (err, response, body) => {
       if (err) {
         // No scores to read
-        speech = res.strings.LEADER_NO_SCORES;
+        speech = res.getString('LEADER_NO_SCORES');
       } else {
         const leaders = JSON.parse(body);
 
         if (!leaders.count || !leaders.top) {
           // Something went wrong
-          speech = res.strings.LEADER_NO_SCORES;
+          speech = res.getString('LEADER_NO_SCORES');
         } else {
           if (leaders.rank) {
-            speech += res.strings.LEADER_BANKROLL_RANKING
+            speech += res.getString('LEADER_BANKROLL_RANKING')
               .replace('{0}', game.bankroll)
               .replace('{1}', leaders.rank)
-              .replace('{2}', roundPlayers(event, leaders.count));
+              .replace('{2}', roundPlayers(handlerInput, leaders.count));
           }
 
           // And what is the leader board?
           let topScores = leaders.top;
-          topScores = topScores.map((x) => res.strings.LEADER_BANKROLL_FORMAT.replace('{0}', x));
-          speech += res.strings.LEADER_TOP_BANKROLLS.replace('{0}', topScores.length);
+          topScores = topScores.map((x) => res.getString('LEADER_BANKROLL_FORMAT').replace('{0}', x));
+          speech += res.getString('LEADER_TOP_BANKROLLS').replace('{0}', topScores.length);
           speech += speechUtils.and(topScores, {locale: event.request.locale, pause: '300ms'});
         }
       }
@@ -116,46 +116,47 @@ module.exports = {
 
     console.log('Shuffle took ' + (Date.now() - start) + ' ms');
   },
-  sayCard: function(event, card) {
-    const res = require('./resources')(event.request.locale);
-    const suits = JSON.parse(res.strings.CARD_SUITS);
-    const ranks = res.strings.CARD_RANKS.split('|');
+  sayCard: function(handlerInput, card) {
+    const res = require('./resources')(handlerInput);
+    const suits = JSON.parse(res.getString('CARD_SUITS'));
+    const ranks = res.getString('CARD_RANKS').split(';');
 
-    return res.strings.CARD_NAME
+    return res.getString('CARD_NAME')
       .replace('{0}', ranks[card.rank - 1])
       .replace('{1}', suits[card.suit]);
   },
-  sayBetOn: function(event, betOn) {
-    const res = require('./resources')(event.request.locale);
-    const players = JSON.parse(res.strings.BETON_OPTIONS);
+  sayBetOn: function(handlerInput, betOn) {
+    const res = require('./resources')(handlerInput);
+    const players = JSON.parse(res.getString('BETON_OPTIONS'));
     return (players[betOn]) ? players[betOn] : betOn;
   },
-  readHand: function(event, attributes, readBankroll) {
-    const res = require('./resources')(event.request.locale);
+  readHand: function(handlerInput, readBankroll) {
+    const res = require('./resources')(handlerInput);
     let speech = '';
     let reprompt = '';
+    const attributes = handlerInput.attributesManager.getSessionAttributes();
     const game = attributes[attributes.currentGame];
 
     if (readBankroll) {
-      speech += res.strings.READ_BANKROLL.replace('{0}', game.bankroll);
+      speech += res.getString('READ_BANKROLL').replace('{0}', game.bankroll);
     }
     if (game.player && game.player.length) {
       // Repeat what they had
       let cards;
 
-      cards = speechUtils.and(game.player.map((x) => module.exports.sayCard(event, x)));
-      speech += res.strings.READ_OLD_PLAYER_CARDS
+      cards = speechUtils.and(game.player.map((x) => module.exports.sayCard(handlerInput, x)));
+      speech += res.getString('READ_OLD_PLAYER_CARDS')
         .replace('{0}', cards)
         .replace('{1}', module.exports.handTotal(game.player));
 
-      cards = speechUtils.and(game.dealer.map((x) => module.exports.sayCard(event, x)));
-      speech += res.strings.READ_OLD_DEALER_CARDS
+      cards = speechUtils.and(game.dealer.map((x) => module.exports.sayCard(handlerInput, x)));
+      speech += res.getString('READ_OLD_DEALER_CARDS')
         .replace('{0}', cards)
         .replace('{1}', module.exports.handTotal(game.dealer));
 
-      reprompt = res.strings.BET_PLAY_AGAIN.split('|')[0];
+      reprompt = res.getString('BET_PLAY_AGAIN').split('|')[0];
     } else {
-      reprompt = res.strings.GENERIC_REPROMPT;
+      reprompt = res.getString('GENERIC_REPROMPT');
     }
 
     return {speech: speech, reprompt: reprompt};
@@ -226,12 +227,12 @@ module.exports = {
   },
 };
 
-function roundPlayers(event, playerCount) {
-  const res = require('./resources')(event.request.locale);
+function roundPlayers(handlerInput, playerCount) {
+  const res = require('./resources')(handlerInput);
   if (playerCount < 200) {
     return playerCount;
   } else {
     // "Over" to the nearest hundred
-    return res.strings.MORE_THAN_PLAYERS.replace('{0}', 100 * Math.floor(playerCount / 100));
+    return res.getString('MORE_THAN_PLAYERS').replace('{0}', 100 * Math.floor(playerCount / 100));
   }
 }

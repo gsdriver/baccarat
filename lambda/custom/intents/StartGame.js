@@ -16,6 +16,7 @@ module.exports = {
       && !attributes.temp.buttonId) {
       attributes.temp.buttonId = buttons.getPressedButton(request);
       if (attributes.temp.buttonId) {
+        attributes.usedButton = true;
         return true;
       }
     }
@@ -23,17 +24,16 @@ module.exports = {
     return false;
   },
   handle: function(handlerInput) {
-    const event = handlerInput.requestEnvelope;
     const attributes = handlerInput.attributesManager.getSessionAttributes();
-    const res = require('../resources')(event.request.locale);
-    const speech = res.strings.STARTGAME_START;
+    const res = require('../resources')(handlerInput);
+    const speech = res.getString('STARTGAME_START');
 
     // OK, set the button up for betting mode - flashing different colors
     buttons.betInputHandler(handlerInput);
     buttons.turnOffButtons(handlerInput);
     buttons.addBetAnimation(handlerInput, [attributes.temp.buttonId]);
 
-    const reprompt = res.strings.STARTGAME_REPROMPT;
+    const reprompt = res.getString('STARTGAME_REPROMPT');
     return handlerInput.responseBuilder
       .speak(speech)
       .reprompt(reprompt)

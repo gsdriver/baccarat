@@ -13,14 +13,13 @@ module.exports = {
     return ((request.type === 'IntentRequest') && (request.intent.name === 'AMAZON.HelpIntent'));
   },
   handle: function(handlerInput) {
-    const event = handlerInput.requestEnvelope;
     const attributes = handlerInput.attributesManager.getSessionAttributes();
-    const res = require('../resources')(event.request.locale);
+    const res = require('../resources')(handlerInput);
     const game = attributes[attributes.currentGame];
 
-    const output = utils.readHand(event, attributes, true);
+    const output = utils.readHand(handlerInput, attributes, true);
     let help;
-    const helpText = res.strings.HELP_CARD_TEXT
+    const helpText = res.getString('HELP_CARD_TEXT')
       .replace('{0}', game.rules.minBet)
       .replace('{1}', game.rules.maxBet)
       .replace('{2}', game.rules.minBet)
@@ -30,13 +29,13 @@ module.exports = {
     if (attributes.bot) {
       help = output.speech + helpText + ' ' + output.reprompt;
     } else {
-      help = output.speech + res.strings.HELP_TEXT + output.reprompt;
+      help = output.speech + res.getString('HELP_TEXT') + output.reprompt;
     }
 
     return handlerInput.responseBuilder
       .speak(help)
       .reprompt(output.reprompt)
-      .withSimpleCard(res.strings.HELP_CARD_TITLE, helpText)
+      .withSimpleCard(res.getString('HELP_CARD_TITLE'), helpText)
       .getResponse();
   },
 };

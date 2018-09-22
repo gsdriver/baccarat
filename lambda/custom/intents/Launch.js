@@ -12,27 +12,25 @@ module.exports = {
       (handlerInput.requestEnvelope.request.type === 'LaunchRequest');
   },
   handle: function(handlerInput) {
-    const event = handlerInput.requestEnvelope;
     const attributes = handlerInput.attributesManager.getSessionAttributes();
-    const res = require('../resources')(event.request.locale);
+    const res = require('../resources')(handlerInput);
     const game = attributes[attributes.currentGame];
     let speech;
 
     // Either welcome or welcome back
     if (game.rounds) {
-      speech = res.strings.LAUNCH_WELCOME_BACK.replace('{0}', game.bankroll);
+      speech = res.getString('LAUNCH_WELCOME_BACK').replace('{0}', game.bankroll);
     } else {
-      speech = res.strings.LAUNCH_WELCOME;
+      speech = res.getString('LAUNCH_WELCOME');
     }
 
     if (attributes.wasDrunk) {
-      speech += res.strings.LAUNCH_SOBER;
+      speech += res.getString('LAUNCH_SOBER');
       attributes.wasDrunk = undefined;
     }
     attributes.temp.newGame = true;
 
-    const reprompt = (buttons.supportButtons(handlerInput))
-      ? res.strings.LAUNCH_WELCOME_BUTTON : res.strings.LAUNCH_REPROMPT;
+    const reprompt = res.getString((buttons.supportButtons(handlerInput)) ? 'LAUNCH_WELCOME_BUTTON' : 'LAUNCH_REPROMPT');
     speech += reprompt;
     return handlerInput.responseBuilder
       .speak(speech)

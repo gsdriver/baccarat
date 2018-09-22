@@ -21,7 +21,7 @@ module.exports = {
   handle: function(handlerInput) {
     const event = handlerInput.requestEnvelope;
     const attributes = handlerInput.attributesManager.getSessionAttributes();
-    const res = require('../resources')(event.request.locale);
+    const res = require('../resources')(handlerInput);
     const game = attributes[attributes.currentGame];
     let speech = '';
 
@@ -47,13 +47,13 @@ module.exports = {
 
     let reprompt = (attributes.temp.reprompt
       ? attributes.temp.reprompt
-      : res.strings.MARTINI_REPROMPT);
-    if (reprompt.indexOf(res.strings.MARTINI) > -1) {
-      reprompt = res.strings.MARTINI_REPROMPT;
+      : res.getString('MARTINI_REPROMPT'));
+    if (reprompt.indexOf(res.getString('MARTINI')) > -1) {
+      reprompt = res.getString('MARTINI_REPROMPT');
     }
     speech += (attributes.temp.coffee
-      ? res.strings.MARTINI_DRINK_CALM
-      : res.strings.MARTINI_DRINK) + reprompt;
+      ? res.getString('MARTINI_DRINK_CALM')
+      : res.getString('MARTINI_DRINK')) + reprompt;
     attributes.temp.coffee = 0;
 
     // Set button animation and input

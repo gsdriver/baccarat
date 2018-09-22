@@ -10,13 +10,13 @@ module.exports = {
   },
   handle: function(handlerInput) {
     const event = handlerInput.requestEnvelope;
-    const res = require('../resources')(event.request.locale);
+    const res = require('../resources')(handlerInput);
 
     // Fail silently if this was an unhandled button event
     if (event.request.type !== 'GameEngine.InputHandlerEvent') {
       return handlerInput.responseBuilder
-        .speak(res.strings.UNKNOWN_INTENT)
-        .reprompt(res.strings.UNKNOWN_INTENT_REPROMPT)
+        .speak(res.getString('UNKNOWN_INTENT'))
+        .reprompt(res.getString('UNKNOWN_INTENT_REPROMPT'))
         .getResponse();
     }
   },
