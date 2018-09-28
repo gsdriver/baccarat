@@ -140,7 +140,9 @@ function runGame(event, context, callback) {
 
   // If this is a CanFulfill, handle this separately
   if (event.request && (event.request.type == 'CanFulfillIntentRequest')) {
-    callback(null, CanFulfill.check(event));
+    CanFulfill.check(event, (response) => {
+      callback(null, response);
+    });
     return;
   }
 
